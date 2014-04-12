@@ -1,0 +1,77 @@
+<div class="inasafe_window">
+    <div class="container">
+        <img ng-src="{{ static_url("img/inasafe/logo.png") }}" style="width:100%;">
+        
+        <div ng-show="!help_toggle"> 
+            <div class="filetree panel panel-primary" ng-controller="FileTreeCtrl">
+                <ul class="jqueryFileTree" >
+                    <li ng-repeat="layer in layers" class="file">
+                        <a href="" ng-click='showLayer(layer)'>{{! layer.name }}</a>
+                    </li>
+                </ul>
+            </div>
+            <legend>
+                <label>Question</label>
+            </legend>
+        
+            <label>In the event of:</label>
+            <input type="text" id="hazard" disabled="disabled" placeholder="Hazard" ng-model="hazard_name">
+            <label>How Many:</label>
+            <input type="text" id="exposure" disabled="disabled" placeholder="Exposure" ng-model="exposure_name">
+            <label>Will be:</label>
+            <input type="text" id="impact" disabled="disabled" placeholder="Impact" ng-model="impact">
+        
+            <div class="button_center">
+                <button class="btn btn-danger btn-sm" ng-click="init()">Reset</button>
+                <button class="btn btn-primary btn-sm" ng-click="calculate()" ng-hide="resultReady">Calculate</button>
+                <button class="btn btn-primary btn-sm" ng-click="open()" ng-show="resultReady">Show Report</button>
+            </div>
+        
+            <div class="button_center">
+                <button class="btn btn-success btn-sm" ng-click="showHelp()">Help</button>
+            </div>
+        </div>
+        
+        <div ng-show="help_toggle">
+            <div class="panel panel-primary getting_started">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Getting Started</h3>
+                </div>
+                <div class="panel-body">
+                    To use this tool you need to select some layers in the website.
+                    Ensure that at least one <b>Hazard</b> layer (e.g. earthquake MMI) and one
+                    <b>Exposure</b> layer (e.g. structures) are available.
+                    If you need to familiarize yourself with WebSAFE, click the <b>"?"</b> button in the title bar.
+                </div>
+            </div>
+            
+            <div class="panel panel-danger limitations">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Limitations</h3>
+                </div>
+                <div class="panel-body">
+                    <ol>
+                        <li>WebSAFE is not a hazard modelling tool</li>
+                        <li>Exposure data in the form of roads (or any other line feature is not yet supported)</li>
+                        <li>Polygon are analysis (such as land use) is not yet supported.</li>
+                        <li>Population density data must be provided in WGS84 geographic coordinates</li>
+                        <li>Neither Project NOAH, nor the World Bank-GFDRR, take any responsibility
+                            for the correctness of outputs from WebSAFE or decisions derived as a consequence.</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="button_center">
+                <button class="btn btn-primary btn-sm" ng-click="hideHelp()">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/ng-template" id="calculateResults.html">
+        <div class="modal-body" ng-bind-html="html"></div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="viewPdf()">View Pdf</button>
+            <button class="btn btn-warning" ng-click="close()">Close</button>
+        </div>
+    </script>
+</div>

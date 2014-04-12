@@ -1,0 +1,7 @@
+/.vagrant/*
+/server/geoserver/*
+/server/downloaded/*
+/server/data/impact/*
+/server/data/impact summary/*
+
+*.pyc
