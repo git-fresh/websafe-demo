@@ -319,6 +319,10 @@ li.selected-flood {
   padding-top: 5px;
 }
 
+.spinner {
+  background-image: url(../img/spinner.gif);
+}
+
 .modal-body {
   height: 400px;
   overflow: auto;

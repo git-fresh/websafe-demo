@@ -4,8 +4,18 @@ from paver.easy import path, sh, info, call_task
 
 from geoserver.catalog import Catalog
 
-from settings import GEOSERVER_REST_URL, GS_USERNAME, \
-    GS_PASSWORD, GEOSERVER_WORKSPACE, GEOSERVER_STORE
+from settings import (
+    GEOSERVER_REST_URL,
+    GS_USERNAME,
+    GS_PASSWORD,
+    GEOSERVER_WORKSPACE,
+    GEOSERVER_STORE,
+    DATA_PATH,
+    ROOT
+)
+
+from weasyprint import HTML, CSS
+
 
 def make_data_dirs():
 	try:
@@ -19,14 +29,21 @@ def make_data_dirs():
 	except:
 		raise
 
-def print_pdf(html):
-    html = self.get_argument("html")
-    output = os.path.join(DATA_PATH, 'pdf', 'report.pdf')
-    data = open(os.path.join(ROOT, 'static', 'css', 'pdf.css'))
-    css = data.read()
-    data.close()
-    HTML(string=html).write_pdf(output, stylesheets=[CSS(string=css)])
-    return
+def print_pdf(html, impact_name):
+    try:
+        impact_report_dir = path('data/impact report')
+        if not impact_report_dir.exists():
+            impact_report_dir.makedirs()
+
+        impact_report_filename = "%s.pdf" % impact_name
+
+        output = os.path.join(DATA_PATH, 'impact report', impact_report_filename)
+        data = open(os.path.join(ROOT, 'static', 'css', 'pdf.css'))
+        css = data.read()
+        HTML(string=html).write_pdf(output, stylesheets=[CSS(string=css)])
+        data.close()
+    except:
+        raise
 
 def upload_to_geoserver(impact_file_path):
     data = dict()

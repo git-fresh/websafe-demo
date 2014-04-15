@@ -3,5 +3,6 @@
 /server/downloaded/*
 /server/data/impact/*
 /server/data/impact summary/*
+/server/data/impact report/*
 
 *.pyc

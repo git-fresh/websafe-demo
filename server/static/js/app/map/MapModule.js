@@ -1,5 +1,6 @@
 (function(){
 var attribution = null;
+var baseLayers = null;
 var layers = [];
 
 //some default configurations for the map
@@ -18,7 +19,6 @@ module.controller('MapCtrl', function($scope, $rootScope){
             'rest/services/World_Topo_Map/MapServer">ArcGIS</a>'
     });
     
-    /*
     layers.push(
         new ol.layer.Tile({
             source: new ol.source.XYZ({
@@ -28,7 +28,6 @@ module.controller('MapCtrl', function($scope, $rootScope){
             })
         })
     );
-    */
 
     layers.push(
         new ol.layer.Tile({
@@ -39,10 +38,15 @@ module.controller('MapCtrl', function($scope, $rootScope){
         })  
     );
     
+    
+    baseLayers = new ol.layer.Group({
+        layers: layers
+    })
+    
     //this initializes the map
     $rootScope.map = new ol.Map({
         target: 'map',
-        layers: layers,
+        layers: baseLayers,
         renderer: ol.RendererHint.CANVAS,
         view: new ol.View2D({
             center: ol.proj.transform(center, 'EPSG:4326', 'EPSG:3857'),
@@ -50,6 +54,7 @@ module.controller('MapCtrl', function($scope, $rootScope){
             maxZoom: maxZoom
         })
     });
+    //console.log($rootScope.map.getLayers());
 });
 
 })();

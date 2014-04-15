@@ -1,6 +1,6 @@
 <div class="inasafe_window">
     <div class="container">
-        <img ng-src="{{ static_url("img/inasafe/logo.png") }}" style="width:100%;">
+        <img ng-src="{{ static_url("img/logo.png") }}" style="width:100%;">
         
         <div ng-show="!help_toggle"> 
             <div class="filetree panel panel-primary" ng-controller="FileTreeCtrl">
@@ -10,20 +10,29 @@
                     </li>
                 </ul>
             </div>
+
+            
             <legend>
                 <label>Question</label>
             </legend>
         
             <label>In the event of:</label>
-            <input type="text" id="hazard" disabled="disabled" placeholder="Hazard" ng-model="hazard_name">
+            <input type="text" id="hazard" placeholder="Hazard" ng-model="hazard_name" disabled>
             <label>How Many:</label>
-            <input type="text" id="exposure" disabled="disabled" placeholder="Exposure" ng-model="exposure_name">
+            <input type="text" id="exposure" placeholder="Exposure" ng-model="exposure_name" disabled>
             <label>Will be:</label>
-            <input type="text" id="impact" disabled="disabled" placeholder="Impact" ng-model="impact">
+            <input type="text" id="impact" placeholder="Impact" ng-model="impact" disabled>
         
             <div class="button_center">
                 <button class="btn btn-danger btn-sm" ng-click="init()">Reset</button>
-                <button class="btn btn-primary btn-sm" ng-click="calculate()" ng-hide="resultReady">Calculate</button>
+                
+                <button class="btn btn-primary btn-sm" ng-click="calculate()" ng-hide="resultReady">
+                    Calculate
+                </button>
+                <!--
+                <button class="btn btn-primary btn-sm ladda-button" data-style="zoom-out">
+                    <span class="ladda-label">Calculate</span>
+                </button>-->
                 <button class="btn btn-primary btn-sm" ng-click="open()" ng-show="resultReady">Show Report</button>
             </div>
         

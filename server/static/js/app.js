@@ -1,9 +1,9 @@
 (function(){
 var module = angular.module('noahApp', [
     'map_module',
-    'window_module',
     'toolbar_module',
     'sidebar_module',
+    'websafe_module'
 ]);
 
 

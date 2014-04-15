@@ -1,5 +1,5 @@
 from handlers.handlers import IndexHandler, WebsafeHandler, LayersHandler, \
-	CalculateHandler
+	CalculateHandler, ImpactPdfHandler
 
 import os.path
 import tornado.web
@@ -9,11 +9,12 @@ handlers = [
     (r"/", IndexHandler)
 ]
 
-#This adds the modules that AngularJS' routing service uses
+# api handlers
 handlers += [
     (r"/api/websafe", WebsafeHandler),
     (r"/api/layers", LayersHandler),
     (r"/api/calculate", CalculateHandler),
+    (r"/api/pdf", ImpactPdfHandler),
 ]
 
 class Application(tornado.web.Application):

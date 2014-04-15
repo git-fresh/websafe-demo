@@ -17,7 +17,6 @@ module.factory('MapFunctions', [
 
         return {
             addLayer : function(layer_name){
-            
                 var layer = new ol.layer.Image({
                     source: new ol.source.ImageWMS({
                         url: geoserver_url,
@@ -55,9 +54,9 @@ module.factory('MapFunctions', [
 
             zoomToExtent : function(extent){
                 var center = ol.extent.getCenter(extent);
-
                 var duration = 2000;
                 var start = +new Date();
+
                 var pan = ol.animation.pan({
                     duration: duration,
                     source: map.getView().getCenter(),

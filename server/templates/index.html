@@ -10,6 +10,7 @@
         <link href="{{ static_url("lib/jqueryFileTree/jqueryFileTree.css") }}" rel="stylesheet">
         <link href="{{ static_url("lib/ol3/ol.css") }}" rel="stylesheet" media="screen">
         <link href="{{ static_url("css/bootmain.css") }}" rel="stylesheet" media="screen">
+        <link href="{{ static_url("lib/ladda-spinner/ladda-themeless.min.css") }}" rel="stylesheet" media="screen">
         
         <!--HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries-->
         <!--WARNING: Respond.js doesn't work if you view the page via file://-->
@@ -84,20 +85,25 @@
         <script src="{{ static_url("lib/angular/angular-resource.min.js") }}"></script>
         <script src="{{ static_url("lib/angular/angular-sanitize.min.js") }}"></script>
         <script src="{{ static_url("lib/angular-bootstrap/ui-bootstrap-tpls-0.10.0.js") }}"></script>
-        <script src="{{ static_url("lib/ol3/ol3.js") }}"></script>
+        <script src="{{ static_url("lib/ol3/ol-whitespace.js") }}"></script>
+        <!--<script src="{{ static_url("lib/ol3/ol3.js") }}"></script>-->
         <script src="{{ static_url("lib/jquery.js") }}"></script>
         <script src="{{ static_url("lib/bootstrap/js/bootstrap.min.js") }}"></script>
+        <!--
+        <script src="{{ static_url("lib/ladda-spinner/spin.min.js") }}"></script>
+        <script src="{{ static_url("lib/angular-spinner.js") }}"></script>
+        <script src="{{ static_url("lib/ladda-spinner/ladda.min.js") }}"></script>
+        -->
         <script src="{{ static_url("lib/jqueryFileTree/jqueryFileTree.js") }}"></script>
         
         <!-- Import javascript codes -->
         <script src="{{ static_url("js/app/utils.js") }}"></script>
         <script src="{{ static_url("js/app/config.js") }}"></script>
-        <script src="{{ static_url("js/app/window/WindowModule.js") }}"></script>
         <script src="{{ static_url("js/app/map/MapService.js") }}"></script>
         <script src="{{ static_url("js/app/map/MapModule.js") }}"></script>
         <script src="{{ static_url("js/app/toolbar/ToolbarModule.js") }}"></script>
-        <script src="{{ static_url("js/app/sidebar/SidebarService.js") }}"></script>
         <script src="{{ static_url("js/app/sidebar/SidebarModule.js") }}"></script>
+        <script src="{{ static_url("js/app/websafe/WebsafeModule.js") }}"></script>
         <script src="{{ static_url("js/app.js") }}"></script>
         
     </body>

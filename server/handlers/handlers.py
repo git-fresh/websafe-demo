@@ -18,10 +18,9 @@ from settings import (
     DATA_PATH
 )
 
-from utilities import make_data_dirs, upload_to_geoserver
+from utilities import make_data_dirs, upload_to_geoserver, print_pdf
 from geoserver.catalog import Catalog
 
-from weasyprint import HTML, CSS
 
 class IndexHandler(tornado.web.RequestHandler):
 	def get(self):
@@ -46,7 +45,7 @@ class LayersHandler(tornado.web.RequestHandler):
         
 class CalculateHandler(tornado.web.RequestHandler):
     def get(self):
-        data = None
+        data = dict()
         extension = '.shp'
         encoding = sys.getfilesystemencoding()
         hazard_title = self.get_argument("hazard_title") + extension
@@ -107,7 +106,8 @@ class CalculateHandler(tornado.web.RequestHandler):
                         summary.close()
 
                     data = upload_to_geoserver(output)
-                    data['html'] = impact.get_impact_summary()
+                    data['html'] = result
+                    print_pdf(result, impact_base_name)
                 except:
                     raise
         except:
@@ -116,3 +116,15 @@ class CalculateHandler(tornado.web.RequestHandler):
         else:
             self.set_header("Content-Type", "application/json")
             self.write(json.dumps(data))
+
+class ImpactPdfHandler(tornado.web.RequestHandler):
+    def get(self):
+        impact_name = "%s.pdf" % self.get_argument("q")
+        try:
+            data = open(os.path.join(DATA_PATH, 'impact report', impact_name))
+            f = data.read()
+            self.set_header("Content-Type", "application/pdf")
+            self.write(f)
+            data.close()
+        except:
+            raise
