@@ -10,7 +10,7 @@
         <link href="{{ static_url("lib/jqueryFileTree/jqueryFileTree.css") }}" rel="stylesheet">
         <link href="{{ static_url("lib/ol3/ol.css") }}" rel="stylesheet" media="screen">
         <link href="{{ static_url("css/bootmain.css") }}" rel="stylesheet" media="screen">
-        <link href="{{ static_url("lib/ladda-spinner/ladda-themeless.css") }}" rel="stylesheet" media="screen">
+        <link href="{{ static_url("lib/ladda-spinner/ladda-themeless.min.css") }}" rel="stylesheet" media="screen">
         
         <!--HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries-->
         <!--WARNING: Respond.js doesn't work if you view the page via file://-->
@@ -40,11 +40,6 @@
                     <ul class="nav navbar-nav">
                         <li class="active"><a href="#">Home</a></li>
                         <li><a href="#">Legend</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">Help</a></li>
-                        <li><a href="#">Sign In</a></li>
-                        <li><a href="#">Contact Us</a></li>
                     </ul>
                 </div>
             </div>
@@ -74,34 +69,20 @@
                 <p class="text-muted">Project NOAH 2014</p>
             </div>
         </div>
-        
-        <!--
-        <script type="text/javascript"
-            src="http://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places">
-        </script>
-        -->
+
         <!-- Import all javascript dependencies -->
         <script src="{{ static_url("lib/angular/angular.min.js") }}"></script>
-        <script src="{{ static_url("lib/angular/angular-resource.min.js") }}"></script>
-        <script src="{{ static_url("lib/angular/angular-sanitize.min.js") }}"></script>
-        <script src="{{ static_url("lib/angular-bootstrap/ui-bootstrap-tpls-0.10.0.js") }}"></script>
-        <script src="{{ static_url("lib/ol3/ol-whitespace.js") }}"></script>
-        <!--<script src="{{ static_url("lib/ol3/ol3.js") }}"></script>-->
         <script src="{{ static_url("lib/jquery.js") }}"></script>
         <script src="{{ static_url("lib/bootstrap/js/bootstrap.min.js") }}"></script>
-        <script src="{{ static_url("lib/ladda-spinner/spin.min.js") }}"></script>
-        <script src="{{ static_url("lib/ladda-spinner/ladda.min.js") }}"></script>
-        <script src="{{ static_url("lib/jqueryFileTree/jqueryFileTree.js") }}"></script>
         
         <!-- Import javascript codes -->
-        <script src="{{ static_url("js/app/utils.js") }}"></script>
-        <script src="{{ static_url("js/app/config.js") }}"></script>
-        <script src="{{ static_url("js/app/map/MapService.js") }}"></script>
-        <script src="{{ static_url("js/app/map/MapModule.js") }}"></script>
-        <script src="{{ static_url("js/app/toolbar/ToolbarModule.js") }}"></script>
-        <script src="{{ static_url("js/app/sidebar/SidebarModule.js") }}"></script>
-        <script src="{{ static_url("js/app/websafe/WebsafeModule.js") }}"></script>
-        <script src="{{ static_url("js/app.js") }}"></script>
+        <script src="{{ static_url("js/test/modal.js") }}"></script>
+        <!--
+        <script src="{{ static_url("js/test/.js") }}"></script>
+        <script src="{{ static_url("js/test/.js") }}"></script>
+        <script src="{{ static_url("js/test/.js") }}"></script>
+        -->
+        <script src="{{ static_url("js/test.js") }}"></script>
         
     </body>
 </html>

@@ -18,7 +18,7 @@ module.controller('MapCtrl', function($scope, $rootScope){
         html: 'Tiles &copy; <a href="http://services.arcgisonline.com/ArcGIS/' +
             'rest/services/World_Topo_Map/MapServer">ArcGIS</a>'
     });
-    
+    /*
     layers.push(
         new ol.layer.Tile({
             source: new ol.source.XYZ({
@@ -28,7 +28,7 @@ module.controller('MapCtrl', function($scope, $rootScope){
             })
         })
     );
-
+    */
     layers.push(
         new ol.layer.Tile({
             preload: Infinity,

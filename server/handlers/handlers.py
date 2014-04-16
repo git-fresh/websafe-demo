@@ -2,6 +2,8 @@ import tornado.web
 import os, sys, json
 import requests
 
+from urllib import urlencode
+from httplib2 import Http
 
 from safe.api import read_layer, calculate_impact
 from safe.impact_functions.core import requirements_collect, get_doc_string, \
@@ -15,7 +17,8 @@ from settings import (
     GS_PASSWORD,
     GEOSERVER_WORKSPACE,
     GEOSERVER_STORE,
-    DATA_PATH
+    DATA_PATH,
+    GEOSERVER_COOKIE_URL
 )
 
 from utilities import make_data_dirs, upload_to_geoserver, print_pdf
@@ -24,7 +27,20 @@ from geoserver.catalog import Catalog
 
 class IndexHandler(tornado.web.RequestHandler):
 	def get(self):
-		self.render("index.html")       
+            cookie = []
+            cookie = self.get_cookie('JSESSIONID')
+            if cookie is None:
+                headers = {'content-type': 'application/x-www-form-urlencoded'}
+                http = Http() 
+                data = dict(username=GS_USERNAME, password=GS_PASSWORD) 
+                resp = http.request(GEOSERVER_COOKIE_URL, method="POST", body=urlencode(data), headers=headers)
+
+                data_string = resp[0]['set-cookie']
+                cookie = data_string.split('=')
+                jsessionid = cookie[1].split(';')
+                self.set_cookie(cookie[0], jsessionid[0], path=cookie[2])
+
+            self.render("index.html")
 
 class WebsafeHandler(tornado.web.RequestHandler):
     def get(self):

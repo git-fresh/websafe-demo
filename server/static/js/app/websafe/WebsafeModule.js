@@ -16,8 +16,6 @@ module.controller('WebsafeCtrl', [
     '$modal',
     function($scope, $window, $rootScope, $http, MapFunctions, $modal){
         //Ladda.bind('.ladda-button');
-        //var l = Ladda.create( document.querySelector( '.ladda-button' ) );
-        //l.start();
         $scope.init = function(){
             $scope.help_toggle = false;
             $scope.hazard_name = '';
@@ -31,6 +29,7 @@ module.controller('WebsafeCtrl', [
             $scope.html = '';
             $scope.resultReady = false;
             $scope.loaded = true;
+            $scope.l = null;
 
             //TODO: function that removes all the layers
         }
@@ -85,11 +84,14 @@ module.controller('WebsafeCtrl', [
         };
 
         $scope.calculate = function(){
+
             var calculate_url = 'http://localhost:5000/api/calculate'
             if (($scope.exposure_name == '') || ($scope.hazard_name == '')){
                 //TODO: error handling, don't calculate
             }else{
                 if (($scope.exposure_title != '') && ($scope.hazard_title != '')){
+                    $scope.l = Ladda.create( document.querySelector( '.ladda-button' ) );
+                    $scope.l.start();
                     $scope.loaded = false;
 
                     $http.get(calculate_url, {params: {
@@ -100,11 +102,13 @@ module.controller('WebsafeCtrl', [
                         'exposure_subcategory' : 'structure',
                         'hazard_subcategory' : 'flood'
                     }}).success(function(data, status, headers, config) {
+                        $scope.l.stop();
                         $scope.resultReady = true;
                         $scope.loaded = true;
                         $scope.html = data.html;
                         $scope.impact_resource = data.layer.resource;
                         $scope.open();
+
                         //TODO: remove other layers
                         MapFunctions.addLayer(data.layer.resource);
                         MapFunctions.zoomToExtent($rootScope.extent);
@@ -167,7 +171,7 @@ module.controller('FileTreeCtrl', [
 
                     MapFunctions.addLayer(layer.name);
                     MapFunctions.zoomToExtent(extent);
-                    console.log($rootScope.map.getLayers());
+                    //console.log($rootScope.map.getLayers());
 
                     layer_info.title = data.featureType.title;
                     $rootScope.$emit('layer changed', layer_info);

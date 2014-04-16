@@ -25,14 +25,11 @@
         
             <div class="button_center">
                 <button class="btn btn-danger btn-sm" ng-click="init()">Reset</button>
-                
-                <button class="btn btn-primary btn-sm" ng-click="calculate()" ng-hide="resultReady">
-                    Calculate
-                </button>
-                <!--
-                <button class="btn btn-primary btn-sm ladda-button" data-style="zoom-out">
+
+                <!-- still have to change this to something that is not expand-left -->
+                <button class="btn btn-primary btn-sm ladda-button" data-style="expand-left" ng-click="calculate()" ng-hide="resultReady">
                     <span class="ladda-label">Calculate</span>
-                </button>-->
+                </button>
                 <button class="btn btn-primary btn-sm" ng-click="open()" ng-show="resultReady">Show Report</button>
             </div>
         
