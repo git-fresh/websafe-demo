@@ -17,11 +17,11 @@
             </legend>
         
             <label>In the event of:</label>
-            <input type="text" id="hazard" placeholder="Hazard" ng-model="hazard_name" disabled>
+            <input type="text" id="hazard" placeholder="Hazard" ng-model="hazard.hazard_name" disabled>
             <label>How Many:</label>
-            <input type="text" id="exposure" placeholder="Exposure" ng-model="exposure_name" disabled>
+            <input type="text" id="exposure" placeholder="Exposure" ng-model="exposure.exposure_name" disabled>
             <label>Will be:</label>
-            <input type="text" id="impact" placeholder="Impact" ng-model="impact" disabled>
+            <input type="text" id="impact" placeholder="Impact" ng-model="impact.impact_name" disabled>
         
             <div class="button_center">
                 <button class="btn btn-danger btn-sm" ng-click="init()">Reset</button>
@@ -45,9 +45,9 @@
                 </div>
                 <div class="panel-body">
                     To use this tool you need to select some layers in the website.
-                    Ensure that at least one <b>Hazard</b> layer (e.g. earthquake MMI) and one
+                    Ensure that at least one <b>Hazard</b> layer (e.g. flood) and one
                     <b>Exposure</b> layer (e.g. structures) are available.
-                    If you need to familiarize yourself with WebSAFE, click the <b>"?"</b> button in the title bar.
+                    If you need to familiarize yourself with WebSAFE, click the <b>"Help"</b> button in the navigation bar.
                 </div>
             </div>
             
@@ -59,7 +59,7 @@
                     <ol>
                         <li>WebSAFE is not a hazard modelling tool</li>
                         <li>Exposure data in the form of roads (or any other line feature is not yet supported)</li>
-                        <li>Polygon are analysis (such as land use) is not yet supported.</li>
+                        <li>Polygon area analysis (such as land use) is not yet supported.</li>
                         <li>Population density data must be provided in WGS84 geographic coordinates</li>
                         <li>Neither Project NOAH, nor the World Bank-GFDRR, take any responsibility
                             for the correctness of outputs from WebSAFE or decisions derived as a consequence.</li>

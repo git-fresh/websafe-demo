@@ -15,23 +15,17 @@ module.controller('WebsafeCtrl', [
     'MapFunctions',
     '$modal',
     function($scope, $window, $rootScope, $http, MapFunctions, $modal){
-        //Ladda.bind('.ladda-button');
         $scope.init = function(){
             $scope.help_toggle = false;
-            $scope.hazard_name = '';
-            $scope.hazard_title = '';
-            $scope.hazard_subcategory = '';
-            $scope.exposure_name = '';
-            $scope.exposure_title = '';
-            $scope.exposure_subcategory = '';
-            $scope.impact = '';
+            $scope.hazard = {};
+            $scope.exposure = {};
+            $scope.impact = {};
             $scope.impact_resource = '';
             $scope.html = '';
             $scope.resultReady = false;
             $scope.loaded = true;
             $scope.l = null;
-
-            //TODO: function that removes all the layers
+            MapFunctions.removeAllWMSLayers();
         }
 
         $scope.init();
@@ -66,11 +60,11 @@ module.controller('WebsafeCtrl', [
 
         var unbind = $rootScope.$on('layer changed', function(event, layer_info){
             if (layer_info.type == 'hazard'){
-                $scope.hazard_name = layer_info.name;
-                $scope.hazard_title = layer_info.title;
+                $scope.hazard.hazard_name = layer_info.name;
+                $scope.hazard.hazard_title = layer_info.title;
             }else if (layer_info.type == 'exposure'){
-                $scope.exposure_name = layer_info.name;
-                $scope.exposure_title = layer_info.title;
+                $scope.exposure.exposure_name = layer_info.name;
+                $scope.exposure.exposure_title = layer_info.title;
             }
         });
         $scope.$on('$destroy', unbind);
@@ -84,19 +78,18 @@ module.controller('WebsafeCtrl', [
         };
 
         $scope.calculate = function(){
-
             var calculate_url = 'http://localhost:5000/api/calculate'
-            if (($scope.exposure_name == '') || ($scope.hazard_name == '')){
+            if (($scope.exposure.exposure_name == '') || ($scope.hazard.hazard_name == '')){
                 //TODO: error handling, don't calculate
             }else{
-                if (($scope.exposure_title != '') && ($scope.hazard_title != '')){
+                if (($scope.exposure.exposure_title != '') || ($scope.hazard.hazard_title != '')){
                     $scope.l = Ladda.create( document.querySelector( '.ladda-button' ) );
                     $scope.l.start();
                     $scope.loaded = false;
 
                     $http.get(calculate_url, {params: {
-                        'exposure_title' : $scope.exposure_title,
-                        'hazard_title' : $scope.hazard_title,
+                        'exposure_title' : $scope.exposure.exposure_title,
+                        'hazard_title' : $scope.hazard.hazard_title,
                         //'exposure_subcategory' : $scope.exposure_subcategory,
                         //'hazard_subcategory' : $scope.hazard_subcategory
                         'exposure_subcategory' : 'structure',
@@ -146,22 +139,17 @@ module.controller('FileTreeCtrl', [
 
         $scope.showLayer = function(layer){
             var resource_link = '';
-            var layer_info = {
-                type : '',
-                name : layer.name,
-                title : ''
-            };
+            var layer_info = {name : layer.name};
             
             $http.get(api_url, {params: {'api': layer.href }})
             .success(function(data, status, headers, config) {
                 resource_link = data.layer.resource.href;
 
                 if (resource_link.indexOf("/hazard/") != -1){
-                    type = 'hazard';
+                    layer_info.type = 'hazard';
                 }else if (resource_link.indexOf("/exposure/") != -1){
-                    type = 'exposure';
+                    layer_info.type = 'exposure';
                 }
-                layer_info.type = type;
             }).then(function(){
                 $http.get(api_url, {params: {'api': resource_link }})
                 .success(function(data, status, headers, config) {
@@ -171,7 +159,6 @@ module.controller('FileTreeCtrl', [
 
                     MapFunctions.addLayer(layer.name);
                     MapFunctions.zoomToExtent(extent);
-                    //console.log($rootScope.map.getLayers());
 
                     layer_info.title = data.featureType.title;
                     $rootScope.$emit('layer changed', layer_info);

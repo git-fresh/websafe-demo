@@ -33,7 +33,23 @@ module.factory('MapFunctions', [
                 map.addLayer(layer);
             },
 
-            getLayers : function(){
+            getWMSLayers : function(){
+                var layers = [];
+
+                map.getLayers().forEach(function(layer) {
+                    if (layer instanceof ol.layer.Image){
+                            layers.push(layer);
+                    }
+                });
+
+                return layers;
+            },
+
+            getAllLayers : function(){
+                return map.getLayers().array_;
+            },
+
+            getselectLayers : function(){
                 var layers = [];
 
                 map.getLayers().forEach(function(layer) {
@@ -46,10 +62,25 @@ module.factory('MapFunctions', [
                             layers.push(layer);
                     }
                     */
-                    layers.push(layer);
                 });
 
                 return layers;
+            },
+
+            removeAllWMSLayers : function(){
+                var layer_array = [];
+
+                // first populate a temp array of the layers to be removed
+                map.getLayers().forEach(function(layer) {
+                    if (layer instanceof ol.layer.Image){
+                        layer_array.push(layer);
+                    }
+                });
+
+                // remove all the layers in the temp array
+                for(var i=0; i < layer_array.length; i++){
+                    map.removeLayer(layer_array[i]);
+                }
             },
 
             zoomToExtent : function(extent){
