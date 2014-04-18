@@ -16,6 +16,10 @@ module.factory('MapFunctions', [
         var version = '1.1.1';
 
         return {
+            getMap : function(){
+                return map;
+            },
+
             addLayer : function(layer_name){
                 var layer = new ol.layer.Image({
                     source: new ol.source.ImageWMS({
@@ -31,6 +35,23 @@ module.factory('MapFunctions', [
                 });
 
                 map.addLayer(layer);
+                return layer;
+            },
+
+            fetchWMSLayer : function(layer_name){
+                var layer = new ol.layer.Image({
+                    source: new ol.source.ImageWMS({
+                        url: geoserver_url,
+                        params: {
+                            'SERVICE': 'WMS',
+                            'VERSION': version,
+                            'LAYERS': workspace + layer_name,
+                            'SRS': proj
+                        },
+                        serverType: 'geoserver'
+                    })
+                });
+                return layer;
             },
 
             getWMSLayers : function(){
@@ -38,7 +59,7 @@ module.factory('MapFunctions', [
 
                 map.getLayers().forEach(function(layer) {
                     if (layer instanceof ol.layer.Image){
-                            layers.push(layer);
+                        layers.push(layer);
                     }
                 });
 
@@ -85,6 +106,8 @@ module.factory('MapFunctions', [
 
             zoomToExtent : function(extent){
                 var center = ol.extent.getCenter(extent);
+                var resolution = view.getResolutionForExtent(extent, map.getSize());
+                resolution = view.constrainResolution(resolution, 0, 0) * 100;
                 var duration = 2000;
                 var start = +new Date();
 
@@ -101,7 +124,7 @@ module.factory('MapFunctions', [
 
                 map.beforeRender(zoom, pan);
 
-                view.setResolution(75);
+                view.setResolution(resolution);
                 view.setCenter(ol.proj.transform(center, 'EPSG:4326', 'EPSG:3857'));
             }
         }

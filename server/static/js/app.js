@@ -3,7 +3,8 @@ var module = angular.module('noahApp', [
     'map_module',
     'toolbar_module',
     'sidebar_module',
-    'websafe_module'
+    'websafe_module',
+    'ngRoute'
 ]);
 
 

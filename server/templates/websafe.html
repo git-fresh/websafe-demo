@@ -20,8 +20,12 @@
             <input type="text" id="hazard" placeholder="Hazard" ng-model="hazard.hazard_name" disabled>
             <label>How Many:</label>
             <input type="text" id="exposure" placeholder="Exposure" ng-model="exposure.exposure_name" disabled>
-            <label>Will be:</label>
-            <input type="text" id="impact" placeholder="Impact" ng-model="impact.impact_name" disabled>
+            <label>Will be:</label><br/>
+            <select id="impact" 
+                ng-init="impact.impact_function = impact_functions[0].value"
+                ng-model="impact.impact_function" 
+                ng-options="impact.value as impact.label for impact in impact_functions">
+            </select>
         
             <div class="button_center">
                 <button class="btn btn-danger btn-sm" ng-click="init()">Reset</button>

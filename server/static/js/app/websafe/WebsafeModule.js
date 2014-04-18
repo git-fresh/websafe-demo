@@ -2,6 +2,7 @@
 
 var module = angular.module('websafe_module', [
     'utils',
+    'config',
     'map_service',
     'ui.bootstrap',
     'ngSanitize'
@@ -14,13 +15,14 @@ module.controller('WebsafeCtrl', [
     '$http',
     'MapFunctions',
     '$modal',
-    function($scope, $window, $rootScope, $http, MapFunctions, $modal){
+    'Config',
+    function($scope, $window, $rootScope, $http, MapFunctions, $modal, Config){
         $scope.init = function(){
             $scope.help_toggle = false;
             $scope.hazard = {};
             $scope.exposure = {};
-            $scope.impact = {};
-            $scope.impact_resource = '';
+            $scope.impact_functions = Config.impact_functions;
+            $scope.impact = {impact_function : Config.impact_functions[0].value};
             $scope.html = '';
             $scope.resultReady = false;
             $scope.loaded = true;
@@ -39,7 +41,7 @@ module.controller('WebsafeCtrl', [
                         return $scope.html;
                     },
                     resource: function(){
-                        return $scope.impact_resource;
+                        return $scope.impact.impact_resource;
                     }
                 }
             });
@@ -49,7 +51,7 @@ module.controller('WebsafeCtrl', [
             $scope.html = html;
 
             $scope.viewPdf = function () {
-                window.open('/api/pdf?q='+resource);
+                window.open('/api/pdf?q=' + resource);
                 $modalInstance.close();
             };
 
@@ -62,10 +64,19 @@ module.controller('WebsafeCtrl', [
             if (layer_info.type == 'hazard'){
                 $scope.hazard.hazard_name = layer_info.name;
                 $scope.hazard.hazard_title = layer_info.title;
+                if ($scope.hazard.layer != null){
+                    $rootScope.map.removeLayer($scope.hazard.layer);
+                }
+                $scope.hazard.layer = layer_info.layer;
             }else if (layer_info.type == 'exposure'){
                 $scope.exposure.exposure_name = layer_info.name;
                 $scope.exposure.exposure_title = layer_info.title;
+                if ($scope.exposure.layer != null){
+                    $rootScope.map.removeLayer($scope.exposure.layer);
+                }
+                $scope.exposure.layer = layer_info.layer;
             }
+            $rootScope.map.addLayer(layer_info.layer);
         });
         $scope.$on('$destroy', unbind);
         
@@ -78,9 +89,11 @@ module.controller('WebsafeCtrl', [
         };
 
         $scope.calculate = function(){
-            var calculate_url = 'http://localhost:5000/api/calculate'
-            if (($scope.exposure.exposure_name == '') || ($scope.hazard.hazard_name == '')){
-                //TODO: error handling, don't calculate
+            var calculate_url = 'http://localhost:5000/api/calculate';
+            if ($scope.exposure.exposure_name == null){
+                alert('Please select exposure layer.');
+            }else if ($scope.hazard.hazard_name == null){
+                alert('Please select hazard layer.');
             }else{
                 if (($scope.exposure.exposure_title != '') || ($scope.hazard.hazard_title != '')){
                     $scope.l = Ladda.create( document.querySelector( '.ladda-button' ) );
@@ -90,22 +103,24 @@ module.controller('WebsafeCtrl', [
                     $http.get(calculate_url, {params: {
                         'exposure_title' : $scope.exposure.exposure_title,
                         'hazard_title' : $scope.hazard.hazard_title,
-                        //'exposure_subcategory' : $scope.exposure_subcategory,
-                        //'hazard_subcategory' : $scope.hazard_subcategory
                         'exposure_subcategory' : 'structure',
-                        'hazard_subcategory' : 'flood'
+                        'hazard_subcategory' : 'flood',
+                        'impact_function' : $scope.impact.impact_function
                     }}).success(function(data, status, headers, config) {
                         $scope.l.stop();
                         $scope.resultReady = true;
                         $scope.loaded = true;
                         $scope.html = data.html;
-                        $scope.impact_resource = data.layer.resource;
-                        $scope.open();
+                        $scope.impact.impact_resource = data.layer.resource;
 
-                        //TODO: remove other layers
-                        MapFunctions.addLayer(data.layer.resource);
+                        MapFunctions.removeAllWMSLayers();
+                        var impact_layer = MapFunctions.fetchWMSLayer(data.layer.resource);
+                        $rootScope.map.addLayer(impact_layer);
                         MapFunctions.zoomToExtent($rootScope.extent);
+                        $scope.open();
                     })
+                }else{
+                    alert('An error has occurred!');
                 }
             }
         };
@@ -127,7 +142,6 @@ module.controller('FileTreeCtrl', [
     'MapFunctions',
     function ($scope, $element, $http, $rootScope, Base64, MapFunctions){
         var url = 'http://localhost:8080/geoserver/rest/layers.json';
-        var geoserver_url = 'http://localhost:8080/geoserver/';
         var api_url = 'http://localhost:5000/api/layers';
 
         // populate the file tree with all the available layers from geoserver
@@ -149,20 +163,32 @@ module.controller('FileTreeCtrl', [
                     layer_info.type = 'hazard';
                 }else if (resource_link.indexOf("/exposure/") != -1){
                     layer_info.type = 'exposure';
+                }else if (resource_link.indexOf("/impact/") != -1){
+                    layer_info.type = 'impact';
                 }
             }).then(function(){
-                $http.get(api_url, {params: {'api': resource_link }})
-                .success(function(data, status, headers, config) {
-                    var bbox = data.featureType.nativeBoundingBox;
-                    var extent = [bbox.minx, bbox.miny, bbox.maxx, bbox.maxy];
-                    if (layer_info.type == 'exposure') $rootScope.extent = extent;
+                if (layer_info.type == 'impact'){
+                    alert('Please choose a hazard layer and exposure layer combination.');
+                }else{
+                    $http.get(api_url, {params: {'api': resource_link }})
+                    .success(function(data, status, headers, config) {
+                        if (data.featureType == null){
+                            alert("Layer not available.");
+                        }else{
+                            var bbox = data.featureType.nativeBoundingBox;
+                            var extent = [bbox.minx, bbox.miny, bbox.maxx, bbox.maxy];
+                            if (layer_info.type == 'exposure'){
+                                $rootScope.extent = extent;
+                            }
 
-                    MapFunctions.addLayer(layer.name);
-                    MapFunctions.zoomToExtent(extent);
+                            layer_info.layer = MapFunctions.fetchWMSLayer(layer.name);
+                            MapFunctions.zoomToExtent(extent);
 
-                    layer_info.title = data.featureType.title;
-                    $rootScope.$emit('layer changed', layer_info);
-                });
+                            layer_info.title = data.featureType.title;
+                            $rootScope.$emit('layer changed', layer_info);
+                        }
+                    });
+                }
             });
         }
     }

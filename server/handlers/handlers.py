@@ -6,10 +6,10 @@ from urllib import urlencode
 from httplib2 import Http
 
 from safe.api import read_layer, calculate_impact
-from safe.impact_functions.core import requirements_collect, get_doc_string, \
-    requirement_check
 from safe.impact_functions.inundation.flood_OSM_building_impact \
     import FloodBuildingImpactFunction
+from safe.impact_functions.inundation.flood_population_evacuation_polygon_hazard \
+    import FloodEvacuationFunctionVectorHazard
 
 from settings import (
     GEOSERVER_REST_URL,
@@ -81,10 +81,11 @@ class CalculateHandler(tornado.web.RequestHandler):
             hazard_layer.keywords['subcategory'] = self.get_argument("hazard_subcategory")
                 
             #define a method that determines the correct impact function based on keywords given
-            impact_function = FloodBuildingImpactFunction
-            #requirements = requirements_collect(impact_function)
-            #print requirements
-            #requirement_check(params=params, require_str=requirements, verbose=True)
+            impact_function_keyword = self.get_argument("impact_function")
+            if impact_function_keyword == 'flood':
+                impact_function = FloodBuildingImpactFunction
+            elif impact_function_keyword == 'population':
+                impact_function = FloodEvacuationFunctionVectorHazard
 
             haz_fnam, ext = os.path.splitext(hazard_title)
             exp_fnam, ext = os.path.splitext(exposure_title)

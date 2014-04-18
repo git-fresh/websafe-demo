@@ -7,6 +7,7 @@ var layers = [];
 var center = [122.5, 12.151436];
 var zoom = 5;
 var maxZoom = 18;
+var map = null;
 
 
 var module = angular.module('map_module', [
@@ -28,7 +29,7 @@ module.controller('MapCtrl', function($scope, $rootScope){
             })
         })
     );
-    */
+    /////////*/
     layers.push(
         new ol.layer.Tile({
             preload: Infinity,
@@ -54,7 +55,6 @@ module.controller('MapCtrl', function($scope, $rootScope){
             maxZoom: maxZoom
         })
     });
-    //console.log($rootScope.map.getLayers());
 });
 
 })();
