@@ -103,8 +103,6 @@ module.controller('WebsafeCtrl', [
                     $http.get(calculate_url, {params: {
                         'exposure_title' : $scope.exposure.exposure_title,
                         'hazard_title' : $scope.hazard.hazard_title,
-                        'exposure_subcategory' : 'structure',
-                        'hazard_subcategory' : 'flood',
                         'impact_function' : $scope.impact.impact_function
                     }}).success(function(data, status, headers, config) {
                         $scope.l.stop();
@@ -118,6 +116,9 @@ module.controller('WebsafeCtrl', [
                         $rootScope.map.addLayer(impact_layer);
                         MapFunctions.zoomToExtent($rootScope.extent);
                         $scope.open();
+                    }).error(function(data, status, headers, config) {
+                        $scope.l.stop();
+                        alert('An internal server error(500) has occurred!');
                     })
                 }else{
                     alert('An error has occurred!');
@@ -165,6 +166,8 @@ module.controller('FileTreeCtrl', [
                     layer_info.type = 'exposure';
                 }else if (resource_link.indexOf("/impact/") != -1){
                     layer_info.type = 'impact';
+                }else{
+                    layer_info.type = 'exposure';
                 }
             }).then(function(){
                 if (layer_info.type == 'impact'){
@@ -172,8 +175,18 @@ module.controller('FileTreeCtrl', [
                 }else{
                     $http.get(api_url, {params: {'api': resource_link }})
                     .success(function(data, status, headers, config) {
-                        if (data.featureType == null){
+                        if ((data.featureType == null) && (data.coverage == null)){
                             alert("Layer not available.");
+                        }else if (data.coverage != null){
+                            var bbox = data.coverage.nativeBoundingBox;
+                            var extent = [bbox.minx, bbox.miny, bbox.maxx, bbox.maxy];
+                            $rootScope.extent = extent;
+                            layer_info.layer = MapFunctions.fetchWMSLayer(layer.name);
+                            MapFunctions.zoomToExtent(extent);
+
+                            layer_info.title = data.coverage.title;
+                            $rootScope.$emit('layer changed', layer_info);
+
                         }else{
                             var bbox = data.featureType.nativeBoundingBox;
                             var extent = [bbox.minx, bbox.miny, bbox.maxx, bbox.maxy];

@@ -20,24 +20,6 @@ module.factory('MapFunctions', [
                 return map;
             },
 
-            addLayer : function(layer_name){
-                var layer = new ol.layer.Image({
-                    source: new ol.source.ImageWMS({
-                        url: geoserver_url,
-                        params: {
-                            'SERVICE': 'WMS',
-                            'VERSION': version,
-                            'LAYERS': workspace + layer_name,
-                            'SRS': proj
-                        },
-                        serverType: 'geoserver'
-                    })
-                });
-
-                map.addLayer(layer);
-                return layer;
-            },
-
             fetchWMSLayer : function(layer_name){
                 var layer = new ol.layer.Image({
                     source: new ol.source.ImageWMS({

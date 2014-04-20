@@ -49,8 +49,7 @@ class WebsafeHandler(tornado.web.RequestHandler):
 class LayersHandler(tornado.web.RequestHandler):
     def get(self):
         temp_url = 'http://localhost:8080/geoserver/rest/layers.json'
-        cat = Catalog("http://localhost:8080/geoserver/rest",
-            username=GS_USERNAME, password=GS_PASSWORD)
+        cat = Catalog(GEOSERVER_REST_URL, username=GS_USERNAME, password=GS_PASSWORD)
         all_layers = cat.get_layers()
         
         url = self.get_argument("api", temp_url)
@@ -62,30 +61,35 @@ class LayersHandler(tornado.web.RequestHandler):
 class CalculateHandler(tornado.web.RequestHandler):
     def get(self):
         data = dict()
-        extension = '.shp'
         encoding = sys.getfilesystemencoding()
-        hazard_title = self.get_argument("hazard_title") + extension
-        hazard_path = os.path.join(DATA_PATH, 'hazard', hazard_title)
+        exposure_title = ''
 
-        exposure_title = self.get_argument("exposure_title") + extension
+        hazard_title = "%s.shp" % self.get_argument("hazard_title")
+        hazard_path = os.path.join(DATA_PATH, 'hazard', hazard_title)
+        impact_function_keyword = self.get_argument("impact_function")
+
+        if impact_function_keyword == 'structure':
+            exposure_title = "%s.shp" % self.get_argument("exposure_title")
+            impact_function = FloodBuildingImpactFunction
+        elif impact_function_keyword == 'population':
+            exposure_title = "%s.tif" % self.get_argument("exposure_title")
+            impact_function = FloodEvacuationFunctionVectorHazard
+
         exposure_path = os.path.join(DATA_PATH, 'exposure', exposure_title)
 
         try:
             hazard_layer = read_layer(hazard_path.encode(encoding))
             exposure_layer = read_layer(exposure_path.encode(encoding))
 
-            # assign the required keywords for inasafe calculations
+            # hardcoded the required keywords for inasafe calculations
             exposure_layer.keywords['category'] = 'exposure'
             hazard_layer.keywords['category'] = 'hazard'
-            exposure_layer.keywords['subcategory'] = self.get_argument("exposure_subcategory")
-            hazard_layer.keywords['subcategory'] = self.get_argument("hazard_subcategory")
-                
-            #define a method that determines the correct impact function based on keywords given
-            impact_function_keyword = self.get_argument("impact_function")
-            if impact_function_keyword == 'flood':
-                impact_function = FloodBuildingImpactFunction
+            hazard_layer.keywords['subcategory'] = 'flood'
+
+            if impact_function_keyword == 'structure':
+                exposure_layer.keywords['subcategory'] = 'structure'
             elif impact_function_keyword == 'population':
-                impact_function = FloodEvacuationFunctionVectorHazard
+                exposure_layer.keywords['subcategory'] = 'population'
 
             haz_fnam, ext = os.path.splitext(hazard_title)
             exp_fnam, ext = os.path.splitext(exposure_title)
