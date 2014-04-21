@@ -89,3 +89,8 @@ def set_style(layer_name, style):
     style = cat.get_style(style, GEOSERVER_WORKSPACE)
     layer.default_style = style
     cat.save(layer)
+
+def make_style(style_name, style_info):
+    style_dir = path('data/styles')
+    if not style_dir.exists():
+        style_dir.makedirs()

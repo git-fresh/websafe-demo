@@ -122,6 +122,7 @@ class CalculateHandler(tornado.web.RequestHandler):
 
                     #create the impact summary file
                     result = impact.keywords["impact_summary"]
+                    print impact.style_info
                     with open(output_summary, 'w') as summary:
                         summary.write(result)
                         summary.close()
