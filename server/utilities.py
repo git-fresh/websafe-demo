@@ -1,4 +1,4 @@
-import sys, requests, os
+import sys, requests, os, math
 
 from paver.easy import path, sh, info, call_task
 
@@ -13,6 +13,8 @@ from settings import (
     DATA_PATH,
     ROOT
 )
+
+from sld import *
 
 from weasyprint import HTML, CSS
 
@@ -66,7 +68,6 @@ def upload_to_geoserver(impact_file_path):
                  'prj' : prj
                }
         cat.add_data_to_store(ds, name, data, ws, True)
-        set_style(name, "Flood Impact")
         layer = { 
                     'workspace': GEOSERVER_WORKSPACE,
                     'store'    : GEOSERVER_STORE,
@@ -91,6 +92,50 @@ def set_style(layer_name, style):
     cat.save(layer)
 
 def make_style(style_name, style_info):
+    cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
     style_dir = path('data/styles')
     if not style_dir.exists():
         style_dir.makedirs()
+
+    style_filename = style_name + '.sld'
+    style_file_path = str(os.path.join(DATA_PATH, 'styles', style_filename))
+
+    target_field = style_info['target_field']
+
+    sld_doc = StyledLayerDescriptor()
+    nl = sld_doc.create_namedlayer(style_name)
+    us = nl.create_userstyle()
+    feature_style = us.create_featuretypestyle()
+
+    for x in style_info['style_classes']:
+        elem = feature_style._node.makeelement('{%s}Rule' % SLDNode._nsmap['sld'], nsmap=SLDNode._nsmap)
+        feature_style._node.append(elem)
+
+        r = Rule(feature_style, len(feature_style._node)-1)
+        r.Title = x['label']
+
+        f1 = Filter(r)
+        f1.PropertyIsGreaterThanOrEqualTo = PropertyCriterion(f1, 'PropertyIsGreaterThanOrEqualTo')
+        f1.PropertyIsGreaterThanOrEqualTo.PropertyName = target_field
+        f1.PropertyIsGreaterThanOrEqualTo.Literal = str(round(x['min']))
+
+        f2 = Filter(r)
+        f2.PropertyIsLessThan = PropertyCriterion(f2, 'PropertyIsLessThan')
+        f2.PropertyIsLessThan.PropertyName = target_field
+        f2.PropertyIsLessThan.Literal = str(round(x['max']))
+
+        r.Filter = f1 + f2
+
+        sym = PolygonSymbolizer(r)
+        fill = Fill(sym)
+        fill.create_cssparameter('fill', x['colour'])
+
+    #print sld_doc.as_sld(True)
+    with open(style_file_path, 'w') as style:
+        style.write(sld_doc.as_sld(True))
+        style.close()
+
+    with open(style_file_path, 'r') as style:
+        cat.create_style(style_name, style.read(), workspace=GEOSERVER_WORKSPACE)
+        style.close()
+    

@@ -1,6 +1,5 @@
 (function(){
 var attribution = null;
-var baseLayers = null;
 var layers = [];
 
 //some default configurations for the map
@@ -19,17 +18,7 @@ module.controller('MapCtrl', function($scope, $rootScope){
         html: 'Tiles &copy; <a href="http://services.arcgisonline.com/ArcGIS/' +
             'rest/services/World_Topo_Map/MapServer">ArcGIS</a>'
     });
-    /*
-    layers.push(
-        new ol.layer.Tile({
-            source: new ol.source.XYZ({
-                attributions: [ attribution ],
-                url: 'http://server.arcgisonline.com/ArcGIS/rest/services/' +
-                        'World_Topo_Map/MapServer/tile/{z}/{y}/{x}'
-            })
-        })
-    );
-    /////////*/
+
     layers.push(
         new ol.layer.Tile({
             preload: Infinity,
@@ -39,15 +28,10 @@ module.controller('MapCtrl', function($scope, $rootScope){
         })  
     );
     
-    
-    baseLayers = new ol.layer.Group({
-        layers: layers
-    })
-    
     //this initializes the map
     $rootScope.map = new ol.Map({
         target: 'map',
-        layers: baseLayers,
+        layers: layers,
         renderer: ol.RendererHint.CANVAS,
         view: new ol.View2D({
             center: ol.proj.transform(center, 'EPSG:4326', 'EPSG:3857'),

@@ -21,7 +21,8 @@ from settings import (
     GEOSERVER_COOKIE_URL
 )
 
-from utilities import make_data_dirs, upload_to_geoserver, print_pdf
+from utilities import make_data_dirs, upload_to_geoserver, print_pdf, \
+    set_style, make_style
 from geoserver.catalog import Catalog
 
 
@@ -108,7 +109,7 @@ class CalculateHandler(tornado.web.RequestHandler):
                         'workspace': GEOSERVER_WORKSPACE,
                         'store'    : GEOSERVER_STORE,
                         'resource' : impact_base_name
-                    }
+                        }
                 data = {'return':'ok', 'layer': layer, 'html' : f}
             else:
                 try:
@@ -122,12 +123,18 @@ class CalculateHandler(tornado.web.RequestHandler):
 
                     #create the impact summary file
                     result = impact.keywords["impact_summary"]
-                    print impact.style_info
                     with open(output_summary, 'w') as summary:
                         summary.write(result)
                         summary.close()
 
                     data = upload_to_geoserver(output)
+
+                    if impact_function_keyword == 'population':
+                        make_style(impact_base_name, impact.style_info)
+                        set_style(impact_base_name, impact_base_name)
+                    else:
+                        set_style(impact_base_name, "Flood-Building")
+
                     data['html'] = result
                     print_pdf(result, impact_base_name)
                 except:

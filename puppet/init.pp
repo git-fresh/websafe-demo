@@ -56,7 +56,7 @@ class inasafe {
     provider => 'apt'
   }
   
-  package { ['tornado', 'numpy', 'sqlalchemy', 'Paver', 'requests', 'gsconfig']:
+  package { ['tornado', 'numpy', 'sqlalchemy', 'Paver', 'requests', 'gsconfig', 'screenutils']:
     ensure  => installed,
     provider => pip
   }

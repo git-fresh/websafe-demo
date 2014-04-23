@@ -16,10 +16,6 @@ module.factory('MapFunctions', [
         var version = '1.1.1';
 
         return {
-            getMap : function(){
-                return map;
-            },
-
             fetchWMSLayer : function(layer_name){
                 var layer = new ol.layer.Image({
                     source: new ol.source.ImageWMS({

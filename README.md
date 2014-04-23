@@ -1,6 +1,6 @@
 WebSAFE demo
-=======
-WebSAFE frontend + backend for demo purposes only
+============
+WebSAFE for demo purposes only
 
 Installation setup
 ==================
@@ -29,14 +29,29 @@ with the following credentials:
     % username: vagrant
     % password: vagrant
 
-Then run:
+Then navigate to the server directory:
 
-    % python /vagrant/webapp/main.py
+    % cd /vagrant/server
 
-and the backend server is accessible in this address:
+if running for the first time, type this command:
     
-    % http://localhost:9090
+    % paver setup_data
+    
+then for succeeding vagrant ups, just type this command:
+    
+    % paver start
 
-and the frontend server is accessible in this address:
+and the server is accessible in this address:
     
     % http://localhost:5000
+    
+to stop the server, just type this command:
+    
+    % paver stop
+    
+
+Developer Notes
+===============
+
+All inputs and user interactions are assumed to be correct 
+since this demo is only to show the basic functionalities of Web InaSAFE.

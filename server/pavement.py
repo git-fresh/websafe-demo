@@ -5,6 +5,29 @@ from paver.easy import task, options, cmdopts, needs
 from paver.easy import path, sh, info, call_task
 from paver.easy import BuildFailure
 
+from geoserver.catalog import Catalog
+
+
+'''
+Define all Geoserver and file directory constants
+'''
+import os
+
+ROOT = os.path.dirname(__file__)
+
+DATA_PATH = os.path.join(ROOT, 'data')
+
+GS_USERNAME = "root"
+GS_PASSWORD = "projectnoah"
+
+GEOSERVER_BASE_URL = 'http://localhost:8080/geoserver/'
+GEOSERVER_REST_URL = GEOSERVER_BASE_URL + 'rest'
+
+GEOSERVER_WORKSPACE = 'websafe'
+GEOSERVER_STORE = 'impact'
+
+from screenutils import list_screens, Screen
+
 try:
     from paver.path import pushd
 except ImportError:
@@ -74,6 +97,67 @@ def _install_data_dir():
         m = re.search('baseUrl>([^<]+)', xml)
         xml = xml[:m.start(1)] + "http://localhost:8000/" + xml[m.end(1):]
         with open(config, 'w') as f: f.write(xml)
+
+@task
+@needs(['setup_geoserver'])
+def setup_data():
+    #TODO: make a workspace, store and upload layers, upload styles and set styles
+    exposure_dir = os.path.join(DATA_PATH, 'exposure')
+    hazard_dir = os.path.join(DATA_PATH, 'hazard')
+    upload_layer(str(os.path.join(hazard_dir, 'quiapo_flood.shp')))
+    upload_layer(str(os.path.join(hazard_dir, 'tacloban_flood.shp')))
+
+    upload_layer(str(os.path.join(exposure_dir, 'quiapo_bldgs.shp')))
+    upload_layer(str(os.path.join(exposure_dir, 'tacloban_bldgs.shp')))
+    #upload_raster(str(os.path.join(exposure_dir, 'tacloban_pop.tif')))
+
+def upload_layer(file_path):
+    data = dict()
+    try:
+        cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
+        ws = cat.get_workspace(GEOSERVER_WORKSPACE)
+        ds = cat.get_store(GEOSERVER_STORE)
+
+        base = str(os.path.splitext(file_path)[0])
+        name = str(os.path.splitext(os.path.basename(base))[0])
+
+        shp = file_path
+        shx = base + '.shx'
+        dbf = base + '.dbf'
+        prj = base + '.prj'
+        data = { 
+                 'shp' : shp,
+                 'shx' : shx,
+                 'dbf' : dbf,
+                 'prj' : prj
+               }
+        cat.add_data_to_store(ds, name, data, ws, True)
+    except:
+        raise
+
+def upload_raster(file_path):
+    data = dict()
+    try:
+        cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
+        ws = cat.get_workspace(GEOSERVER_WORKSPACE)
+        ds = cat.get_store(GEOSERVER_STORE)
+
+        base = str(os.path.splitext(file_path)[0])
+        name = str(os.path.splitext(os.path.basename(base))[0])
+
+        tif = file_path
+        shx = base + '.shx'
+        dbf = base + '.dbf'
+        prj = base + '.prj'
+        data = { 
+                 'shp' : tif,
+                 'shx' : shx,
+                 'dbf' : dbf,
+                 'prj' : prj
+               }
+        cat.add_data_to_store(ds, name, data, ws, True)
+    except:
+        raise
         
 @task
 def start_geoserver(options):
