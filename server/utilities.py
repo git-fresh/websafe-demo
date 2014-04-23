@@ -136,6 +136,6 @@ def make_style(style_name, style_info):
         style.close()
 
     with open(style_file_path, 'r') as style:
-        cat.create_style(style_name, style.read(), workspace=GEOSERVER_WORKSPACE)
+        cat.create_style(style_name, style.read(), workspace=GEOSERVER_WORKSPACE, overwrite=True)
         style.close()
     

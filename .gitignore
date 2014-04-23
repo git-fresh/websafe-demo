@@ -6,3 +6,5 @@
 /server/data/impact report/*
 
 *.pyc
+StyledLayerDescriptor-backup.xsd
+IMPACT_tacloban_pop_tacloban_flood.sld
