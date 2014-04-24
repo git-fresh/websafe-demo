@@ -37,17 +37,23 @@ if running for the first time, type this command:
     
     % paver setup_data
     
-then for succeeding vagrant ups, just type this command:
+the previous command will automatically start geoserver so the next command won't be needed this time.
     
-    % paver start
+to run geoserver next time the virtual machine is started, just type this command:
+    
+    % paver start_geoserver
+    
+then run the tornado server using this command:
 
+    % python main.py
+    
 and the server is accessible in this address:
     
     % http://localhost:5000
     
-to stop the server, just type this command:
+to stop geoserver, just type this command:
     
-    % paver stop
+    % paver stop_geoserver
     
 
 Developer Notes

@@ -63,7 +63,7 @@ class inasafe {
 }
 
 class weasyprint {
-  package {['build-essential', 'libxml2-dev', 'libxslt1-dev', 'libcairo2', 'libpango1.0-0', 'libgdk-pixbuf2.0-0', 'libffi-dev']:
+  package {['libxml2-dev', 'libxslt1-dev', 'libcairo2', 'libpango1.0-0', 'libgdk-pixbuf2.0-0', 'libffi-dev']:
     ensure => present,
     provider => 'apt'
   }
@@ -84,9 +84,9 @@ class weasyprint {
   }
 }
 
-#class {'server_dependencies':}
-#class {'update':}
-#class {'inasafe':}
-#class {'weasyprint':}
+class {'server_dependencies':}
+class {'update':}
+class {'inasafe':}
+class {'weasyprint':}
 
-#Class['server_dependencies'] -> Class['update'] -> Class['inasafe'] -> Class['weasyprint']
+Class['server_dependencies'] -> Class['update'] -> Class['inasafe'] -> Class['weasyprint']

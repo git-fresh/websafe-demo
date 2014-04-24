@@ -12,7 +12,7 @@
       <FeatureTypeStyle>
         <Rule>
           <RasterSymbolizer>
-            <Opacity>0.6</Opacity>
+            <Opacity>0.5</Opacity>
             <ColorMap>
               <ColorMapEntry color="#0000FF" quantity="0" opacity="0"/>
               <ColorMapEntry color="#08FFDA" quantity="0.1"/>

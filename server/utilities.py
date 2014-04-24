@@ -129,6 +129,7 @@ def make_style(style_name, style_info):
         sym = PolygonSymbolizer(r)
         fill = Fill(sym)
         fill.create_cssparameter('fill', x['colour'])
+        fill.create_cssparameter('fill-opacity', '0.5')
 
     #print sld_doc.as_sld(True)
     with open(style_file_path, 'w') as style:

@@ -99,7 +99,10 @@ def _install_data_dir():
         with open(config, 'w') as f: f.write(xml)
 
 @task
-@needs(['setup_geoserver'])
+@needs([
+    'setup_geoserver',
+    'start_geoserver'
+])
 def setup_data():
     #TODO: make a workspace, store and upload layers, upload styles and set styles
     exposure_dir = os.path.join(DATA_PATH, 'exposure')

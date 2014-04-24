@@ -20,6 +20,7 @@
           <PolygonSymbolizer>
             <Fill>
               <CssParameter name="fill">#009999</CssParameter>
+              <CssParameter name="fill-opacity">0.5</CssParameter>
             </Fill>
           </PolygonSymbolizer>
         </Rule>
