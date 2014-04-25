@@ -30,16 +30,19 @@ class IndexHandler(tornado.web.RequestHandler):
 	def get(self):
             cookie = []
             cookie = self.get_cookie('JSESSIONID')
-            if cookie is None:
-                headers = {'content-type': 'application/x-www-form-urlencoded'}
-                http = Http() 
-                data = dict(username=GS_USERNAME, password=GS_PASSWORD) 
-                resp = http.request(GEOSERVER_COOKIE_URL, method="POST", body=urlencode(data), headers=headers)
+            try:
+                if cookie is None:
+                    headers = {'content-type': 'application/x-www-form-urlencoded'}
+                    http = Http() 
+                    data = dict(username=GS_USERNAME, password=GS_PASSWORD) 
+                    resp = http.request(GEOSERVER_COOKIE_URL, method="POST", body=urlencode(data), headers=headers)
 
-                data_string = resp[0]['set-cookie']
-                cookie = data_string.split('=')
-                jsessionid = cookie[1].split(';')
-                self.set_cookie(cookie[0], jsessionid[0], path=cookie[2])
+                    data_string = resp[0]['set-cookie']
+                    cookie = data_string.split('=')
+                    jsessionid = cookie[1].split(';')
+                    self.set_cookie(cookie[0], jsessionid[0], path=cookie[2])
+            except:
+                pass
 
             self.render("index.html")
 
@@ -50,14 +53,19 @@ class WebsafeHandler(tornado.web.RequestHandler):
 class LayersHandler(tornado.web.RequestHandler):
     def get(self):
         temp_url = 'http://localhost:8080/geoserver/rest/layers.json'
-        cat = Catalog(GEOSERVER_REST_URL, username=GS_USERNAME, password=GS_PASSWORD)
-        all_layers = cat.get_layers()
+        try:
+            cat = Catalog(GEOSERVER_REST_URL, username=GS_USERNAME, password=GS_PASSWORD)
+            all_layers = cat.get_layers()
         
-        url = self.get_argument("api", temp_url)
+            url = self.get_argument("api", temp_url)
 
-        headers = {'Accept': '*/*'}
-        resp = requests.get(url, auth=(GS_USERNAME,GS_PASSWORD), headers=headers)
-        self.write(resp.text)
+            headers = {'Accept': '*/*'}
+            resp = requests.get(url, auth=(GS_USERNAME,GS_PASSWORD), headers=headers)
+        except:
+            print 'Geoserver cannot be accessed.'
+            pass
+        else:
+            self.write(resp.text)
         
 class CalculateHandler(tornado.web.RequestHandler):
     def get(self):

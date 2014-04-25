@@ -20,14 +20,18 @@ After doing all of the above, navigate to the root of this directory and run:
 
 ...and wait until every dependency installation has finished executing...
 
-Running Tornado Server
+Running The Server
 ======================
     
-To manually start the Tornado server, just login to the virtual machine or SSH to localhost:2222 
+To manually start the server, just login to the virtual machine or SSH to localhost:2222 
 with the following credentials:
 
     % username: vagrant
     % password: vagrant
+    
+First, manually install Java dependencies
+
+    % sudo apt-get install -y --force-yes openjdk-6-jdk ant maven2 --no-install-recommends
 
 Then navigate to the server directory:
 
@@ -35,11 +39,22 @@ Then navigate to the server directory:
 
 if running for the first time, type this command:
     
+    % paver setup
+    
+the previous command will automatically start geoserver. After the geoserver starts, change the
+password to 'projectnoah' for the root found in:
+
+    % /vagrant/server/geoserver/data/security/masterpw.info
+
+after changing the password to 'projectnoah', run this command in the command line
+to upload all the data for the demo:
+    
     % paver setup_data
-    
-the previous command will automatically start geoserver so the next command won't be needed this time.
-    
-to run geoserver next time the virtual machine is started, just type this command:
+
+
+
+
+to run geoserver manually next time, just type this command:
     
     % paver start_geoserver
     

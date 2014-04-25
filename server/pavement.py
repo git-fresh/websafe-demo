@@ -1,9 +1,7 @@
-import os, re, shutil, sys, time, urllib, zipfile, \
-    glob, fileinput
+import os, re, shutil, sys, time, urllib, zipfile
     
-from paver.easy import task, options, cmdopts, needs
+from paver.easy import task, options, needs
 from paver.easy import path, sh, info, call_task
-from paver.easy import BuildFailure
 
 from geoserver.catalog import Catalog
 
@@ -11,8 +9,6 @@ from geoserver.catalog import Catalog
 '''
 Define all Geoserver and file directory constants
 '''
-import os
-
 ROOT = os.path.dirname(__file__)
 
 DATA_PATH = os.path.join(ROOT, 'data')
@@ -26,8 +22,6 @@ GEOSERVER_REST_URL = GEOSERVER_BASE_URL + 'rest'
 GEOSERVER_WORKSPACE = 'websafe'
 GEOSERVER_STORE = 'impact'
 
-from screenutils import list_screens, Screen
-
 try:
     from paver.path import pushd
 except ImportError:
@@ -37,7 +31,6 @@ assert sys.version_info >= (2, 6), \
     SystemError("WebSAFE requires python 2.6 or better")
     
 GEOSERVER_URL="http://build.geonode.org/geoserver/latest/geoserver.war"
-DATA_DIR_URL="http://build.geonode.org/geoserver/latest/data.zip"
 JETTY_RUNNER_URL="http://repo2.maven.org/maven2/org/mortbay/jetty/jetty-runner/8.1.8.v20121106/jetty-runner-8.1.8.v20121106.jar"
 
 def grab(src, dest, name):
@@ -52,17 +45,10 @@ def grab(src, dest, name):
         urllib.urlretrieve(str(src), str(dest))
         
 @task
-@cmdopts([
-    ('fast', 'f', 'Fast. Skip some operations for speed.'),
-])
-def setup_geoserver(options):
-    """Prepare a testing instance of GeoServer."""
-    fast = options.get('fast', False)
+def setup_geoserver():
     download_dir = path('downloaded')
     if not download_dir.exists():
         download_dir.makedirs()
-
-    geoserver_dir = path('geoserver')
 
     geoserver_bin = download_dir / os.path.basename(GEOSERVER_URL)
     jetty_runner = download_dir / os.path.basename(JETTY_RUNNER_URL)
@@ -70,6 +56,7 @@ def setup_geoserver(options):
     grab(GEOSERVER_URL, geoserver_bin, "geoserver binary")
     grab(JETTY_RUNNER_URL, jetty_runner, "jetty runner")
 
+    geoserver_dir = path('geoserver')
     if not geoserver_dir.exists():
         geoserver_dir.makedirs()
 
@@ -80,6 +67,11 @@ def setup_geoserver(options):
         print 'extracting geoserver'
         z = zipfile.ZipFile(geoserver_bin, "r")
         z.extractall(webapp_dir)
+
+
+    target_data_dir = path('geoserver/data')
+    if not target_data_dir.exists():
+        target_data_dir.makedirs()
 
     _install_data_dir()
 
@@ -103,23 +95,114 @@ def _install_data_dir():
     'setup_geoserver',
     'start_geoserver'
 ])
+def setup():
+    try:
+        impact_dir = path('data/impact')
+        if not impact_dir.exists():
+            impact_dir.makedirs()
+
+        info('Geoserver is now up at %s' % GEOSERVER_BASE_URL)
+        info('Please change the password for the root user. '
+             'The default password is found in: '
+             '/vagrant/server/geoserver/data/security/masterpw.info')
+    except:
+        raise
+
+@task
 def setup_data():
-    #TODO: make a workspace, store and upload layers, upload styles and set styles
-    exposure_dir = os.path.join(DATA_PATH, 'exposure')
-    hazard_dir = os.path.join(DATA_PATH, 'hazard')
-    upload_layer(str(os.path.join(hazard_dir, 'quiapo_flood.shp')))
-    upload_layer(str(os.path.join(hazard_dir, 'tacloban_flood.shp')))
+    haz_conn_params =  {
+        'cache and reuse memory maps': 'true', 
+        'namespace': 'http://inasafe.org', 
+        'filetype': 'shapefile', 
+        'charset': 'ISO-8859-1', 
+        'create spatial index': 'true', 
+        'fstype': 'shape', 
+        'url': 'file:///vagrant/server/data/hazard', 
+        'enable spatial index': 'true', 
+        'memory mapped buffer': 'false', 
+        'timezone': 'Etc/UTC'
+    }
+    exp_conn_params =  {
+        'cache and reuse memory maps': 'true', 
+        'namespace': 'http://inasafe.org', 
+        'filetype': 'shapefile', 
+        'charset': 'ISO-8859-1', 
+        'create spatial index': 'true', 
+        'fstype': 'shape', 
+        'url': 'file:///vagrant/server/data/exposure', 
+        'enable spatial index': 'true', 
+        'memory mapped buffer': 'false', 
+        'timezone': 'Etc/UTC'
+    }
+    impact_conn_params =  {
+        'cache and reuse memory maps': 'true', 
+        'namespace': 'http://inasafe.org', 
+        'filetype': 'shapefile', 
+        'charset': 'ISO-8859-1', 
+        'create spatial index': 'true', 
+        'fstype': 'shape', 
+        'url': 'file:///vagrant/server/data/impact', 
+        'enable spatial index': 'true', 
+        'memory mapped buffer': 'false', 
+        'timezone': 'Etc/UTC'
+    }
 
-    upload_layer(str(os.path.join(exposure_dir, 'quiapo_bldgs.shp')))
-    upload_layer(str(os.path.join(exposure_dir, 'tacloban_bldgs.shp')))
-    #upload_raster(str(os.path.join(exposure_dir, 'tacloban_pop.tif')))
+    try:
+        cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
+        cat.create_workspace(GEOSERVER_WORKSPACE, 'http://inasafe.org')
+        cat.set_default_workspace(GEOSERVER_WORKSPACE)
 
-def upload_layer(file_path):
+        haz_store = cat.create_datastore('hazard')
+        haz_store.type = 'Directory of spatial files (shapefiles)'
+        haz_store.connection_parameters = haz_conn_params
+        cat.save(haz_store)
+
+        exp_store = cat.create_datastore('exposure')
+        exp_store.type = 'Directory of spatial files (shapefiles)'
+        exp_store.connection_parameters = exp_conn_params
+        cat.save(exp_store)
+
+        impact_store = cat.create_datastore('impact')
+        impact_store.type = 'Directory of spatial files (shapefiles)'
+        impact_store.connection_parameters = impact_conn_params
+        cat.save(impact_store)
+
+        exposure_dir = os.path.join(DATA_PATH, 'exposure')
+        hazard_dir = os.path.join(DATA_PATH, 'hazard')
+
+        upload_layer(str(os.path.join(exposure_dir, 'quiapo_bldgs.shp')), 'exposure')
+        upload_layer(str(os.path.join(exposure_dir, 'tacloban_bldgs.shp')), 'exposure')
+        upload_raster(str(os.path.join(exposure_dir, 'tacloban_pop.tif')), 'exposure')
+
+        upload_layer(str(os.path.join(hazard_dir, 'quiapo_flood.shp')), 'hazard')
+        upload_layer(str(os.path.join(hazard_dir, 'tacloban_flood.shp')), 'hazard')
+        
+        '''
+        # upload the styles in data/styles folder
+        upload_style('Building Footprints')
+        upload_style('Flood Hazard Quiapo')
+        upload_style('Flood Hazard')
+        upload_style('Flood-Building')
+        upload_style('Population Exposure')
+
+        # set styles for each layer uploaded
+        set_style('quiapo_flood', "Flood Hazard Quiapo")
+        set_style('tacloban_flood', "Flood Hazard")
+        set_style('quiapo_bldgs', "Building Footprints")
+        set_style('tacloban_bldgs', "Building Footprints")
+        set_style('tacloban_pop', "Population Exposure")
+        '''
+
+    except:
+        print 'Error in setting up geoserver test environment.'
+        raise
+
+def upload_layer(file_path, store):
     data = dict()
     try:
         cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
         ws = cat.get_workspace(GEOSERVER_WORKSPACE)
-        ds = cat.get_store(GEOSERVER_STORE)
+        ds = cat.get_store(store)
 
         base = str(os.path.splitext(file_path)[0])
         name = str(os.path.splitext(os.path.basename(base))[0])
@@ -138,44 +221,35 @@ def upload_layer(file_path):
     except:
         raise
 
-def upload_raster(file_path):
+def upload_raster(file_path, store):
     data = dict()
     try:
         cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
         ws = cat.get_workspace(GEOSERVER_WORKSPACE)
-        ds = cat.get_store(GEOSERVER_STORE)
+        ds = cat.get_store(store)
 
         base = str(os.path.splitext(file_path)[0])
         name = str(os.path.splitext(os.path.basename(base))[0])
 
-        tif = file_path
-        shx = base + '.shx'
-        dbf = base + '.dbf'
-        prj = base + '.prj'
-        data = { 
-                 'shp' : tif,
-                 'shx' : shx,
-                 'dbf' : dbf,
-                 'prj' : prj
-               }
-        cat.add_data_to_store(ds, name, data, ws, True)
+        cat.create_coveragestore(name, file_path, ws, True)
+    except:
+        raise
+
+def upload_style(style_name):
+    try:
+        cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
+        style_dir = path('data/styles')
+        style_filename = style_name + '.sld'
+        style_file_path = str(os.path.join(DATA_PATH, 'styles', style_filename))
+
+        with open(style_file_path, 'r') as style:
+            cat.create_style(style_name, style.read(), workspace=GEOSERVER_WORKSPACE, overwrite=True)
+            style.close()
     except:
         raise
         
 @task
 def start_geoserver(options):
-    """
-    Start GeoServer with GeoNode extensions
-    """
-
-    #from geonode.settings import OGC_SERVER 
-    #GEOSERVER_BASE_URL = OGC_SERVER['default']['LOCATION']
-
-    url = "http://localhost:8080/geoserver/"
-    #if GEOSERVER_BASE_URL != url:
-    #    print 'your GEOSERVER_BASE_URL does not match %s' % url
-    #    sys.exit(1)
-
     download_dir = path('downloaded').abspath()
     jetty_runner = download_dir / os.path.basename(JETTY_RUNNER_URL)
     data_dir = path('geoserver/data').abspath()
@@ -195,10 +269,10 @@ def start_geoserver(options):
             ' > /dev/null &' % locals()
           ))
 
-    info('Starting GeoServer on %s' % url)
+    info('Starting GeoServer on %s' % GEOSERVER_BASE_URL)
 
     # wait for GeoServer to start
-    started = waitfor(url)
+    started = waitfor(GEOSERVER_BASE_URL)
     info('The logs are available at %s' % log_file)
 
     if not started:
@@ -210,9 +284,6 @@ def start_geoserver(options):
         
 @task
 def stop_geoserver():
-    """
-    Stop GeoServer
-    """
     kill('java', 'geoserver')
         
 def kill(arg1, arg2):
@@ -280,3 +351,15 @@ def justcopy(origin, target):
         if not os.path.exists(target):
             os.makedirs(target)
         shutil.copy(origin, target)
+
+def set_style(layer_name, style):
+    cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
+    layer = cat.get_layer(layer_name)
+
+    if style is None:
+        print 'No style specified!'
+        return
+    
+    style = cat.get_style(style, GEOSERVER_WORKSPACE)
+    layer.default_style = style
+    cat.save(layer)
