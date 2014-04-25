@@ -14,11 +14,6 @@ class update {
     ensure => present,
     before => Exec['apt-update']
   }
-  
-  #exec {'add-ubuntugis':
-  #  command => '/usr/bin/add-apt-repository ppa:ubuntugis/ubuntugis-unstable',
-  #  before => Exec['apt-update']
-  #}
 
   exec {'add-python-software':
     path => ["/usr/bin/","/usr/sbin/","/bin"],
@@ -40,9 +35,8 @@ class update {
 }
 
 class server_dependencies {
-  
-  package {['python-setuptools', 'python-dev', 'build-essential',
-            'python-numpy', 'python-nose', 'git', ]:
+  package {['python-pip', 'python-setuptools', 'python-dev', 'build-essential',
+            'python-numpy', 'python-nose', 'git']:
     ensure => present,
     provider => 'apt'
   }
@@ -50,20 +44,20 @@ class server_dependencies {
 
 class inasafe {
   
-  package {['python-pip', 'python-sphinx', 'pyqt4-dev-tools', 'python-gdal', 'curl', 'libpq-dev', 
-            'gdal-bin', 'python-qgis' ]:
+  package {['python-sphinx', 'pyqt4-dev-tools', 'python-gdal', 'curl', 'libpq-dev', 
+            'gdal-bin', 'python-qgis']:
     ensure => present,
     provider => 'apt'
   }
   
-  package { ['tornado', 'numpy', 'sqlalchemy', 'Paver', 'requests', 'gsconfig', 'screenutils']:
+  package { ['tornado', 'Paver', 'requests', 'gsconfig', 'python-sld']:
     ensure  => installed,
     provider => pip
   }
 }
 
 class weasyprint {
-  package {['libxml2-dev', 'libxslt1-dev', 'libcairo2', 'libpango1.0-0', 'libgdk-pixbuf2.0-0', 'libffi-dev']:
+  package {[ 'libcairo2-dev', 'libxslt1-dev', 'libpango1.0-0', 'libgdk-pixbuf2.0-0', 'libffi-dev']:
     ensure => present,
     provider => 'apt'
   }
@@ -73,20 +67,15 @@ class weasyprint {
     provider => pip
   }
   
-  package { 'lxml':
-    ensure  => '3.2.3',
-    provider => pip
-  }
-  
-  package { ['tinycss', 'cssselect', 'cairosvg', 'pyphen', 'cairocffi', 'html5lib', 'weasyprint']:
+  package { ['html5lib', 'cairosvg', 'tinycss', 'cssselect', 'pyphen', 'cairocffi', 'weasyprint']:
     ensure  => installed,
     provider => pip
   }
 }
 
-class {'server_dependencies':}
 class {'update':}
+class {'server_dependencies':}
 class {'inasafe':}
 class {'weasyprint':}
 
-Class['server_dependencies'] -> Class['update'] -> Class['inasafe'] -> Class['weasyprint']
+Class['update'] -> Class['server_dependencies'] -> Class['inasafe'] -> Class['weasyprint']

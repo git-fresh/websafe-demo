@@ -20,6 +20,12 @@ After doing all of the above, navigate to the root of this directory and run:
 
 ...and wait until every dependency installation has finished executing...
 
+then run:
+
+    % vagrant provision
+
+to install the remaining dependencies.
+
 Running The Server
 ======================
     
@@ -37,12 +43,14 @@ Then navigate to the server directory:
 
     % cd /vagrant/server
 
+## Running for the first time
+
 if running for the first time, type this command:
     
     % paver setup
     
 the previous command will automatically start geoserver. After the geoserver starts, change the
-password to 'projectnoah' for the root found in:
+password to `projectnoah` for the root found in:
 
     % /vagrant/server/geoserver/data/security/masterpw.info
 
@@ -51,10 +59,9 @@ to upload all the data for the demo:
     
     % paver setup_data
 
+## Manually running Geoserver
 
-
-
-to run geoserver manually next time, just type this command:
+To run geoserver manually next time, just type this command:
     
     % paver start_geoserver
     
