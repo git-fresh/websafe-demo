@@ -7,15 +7,14 @@ var module = angular.module('noahApp', [
     'ngRoute'
 ]);
 
-
 //configure the routing for the sidebar ng-view    
 module.config([
     '$routeProvider',
     function($routeProvider){
-        $routeProvider.
-        when('/', {
+        $routeProvider
+        .when('/', {
             controller: 'SidebarCtrl'
-        })  .when('/websafe', {
+        }).when('/websafe', {
             controller: 'WebsafeCtrl',
             templateUrl:'/api/websafe'
         }).otherwise({redirectTo:'/'});

@@ -8,6 +8,21 @@ var module = angular.module('websafe_module', [
     'ngSanitize'
 ]);
 
+module.controller('ModalCtrl', [
+    '$scope',
+    '$modalInstance',
+    function($scope, $modalInstance){
+        $scope.viewPdf = function () {
+            window.open('/api/pdf?q=' + $scope.$parent.impact.impact_resource);
+            $modalInstance.close();
+        };
+
+        $scope.close = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    }
+]);
+
 module.controller('WebsafeCtrl', [
     '$scope',
     '$window',
@@ -25,60 +40,46 @@ module.controller('WebsafeCtrl', [
             $scope.impact = {impact_function : Config.impact_functions[0].value};
             $scope.html = '';
             $scope.resultReady = false;
-            $scope.loaded = true;
             $scope.l = null;
             MapFunctions.removeAllWMSLayers();
-        }
-
+        };
         $scope.init();
 
+        // This function creates and opens a modal instance
         $scope.open = function () {
             var modalInstance = $modal.open({
                 templateUrl: 'calculateResults.html',
-                controller: ModalInstanceCtrl,
-                resolve: {
-                    html: function () {
-                        return $scope.html;
-                    },
-                    resource: function(){
-                        return $scope.impact.impact_resource;
-                    }
-                }
+                controller: 'ModalCtrl',
+                scope: $scope
             });
         };
 
-        var ModalInstanceCtrl = function ($scope, $modalInstance, html, resource) {
-            $scope.html = html;
-
-            $scope.viewPdf = function () {
-                window.open('/api/pdf?q=' + resource);
-                $modalInstance.close();
-            };
-
-            $scope.close = function () {
-                $modalInstance.dismiss('cancel');
-            };
-        };
-
-        var unbind = $rootScope.$on('layer changed', function(event, layer_info){
+        // This is a listener for changes in layer(exposure or hazard)
+        var layer_change_listener = $rootScope.$on('layer changed', function(event, layer_info){
             if (layer_info.type == 'hazard'){
-                $scope.hazard.hazard_name = layer_info.name;
-                $scope.hazard.hazard_title = layer_info.title;
                 if ($scope.hazard.layer != null){
                     $rootScope.map.removeLayer($scope.hazard.layer);
                 }
+                $scope.hazard.hazard_name = layer_info.name;
+                $scope.hazard.hazard_title = layer_info.title;
                 $scope.hazard.layer = layer_info.layer;
+                $scope.hazard.legend = layer_info.legendUrl;
+                $scope.hazard.showLegend = true;
+                $('.legend_hazard').draggable();
             }else if (layer_info.type == 'exposure'){
-                $scope.exposure.exposure_name = layer_info.name;
-                $scope.exposure.exposure_title = layer_info.title;
                 if ($scope.exposure.layer != null){
                     $rootScope.map.removeLayer($scope.exposure.layer);
                 }
+                $scope.exposure.exposure_name = layer_info.name;
+                $scope.exposure.exposure_title = layer_info.title;
                 $scope.exposure.layer = layer_info.layer;
+                $scope.exposure.legend = layer_info.legendUrl;
+                $scope.exposure.showLegend = true;
+                $('.legend_exposure').draggable();
             }
             $rootScope.map.addLayer(layer_info.layer);
         });
-        $scope.$on('$destroy', unbind);
+        $scope.$on('$destroy', layer_change_listener);      // this unbinds the listener when the scope is destroyed
         
         $scope.showHelp = function(){
             $scope.help_toggle = true;
@@ -88,6 +89,7 @@ module.controller('WebsafeCtrl', [
             $scope.help_toggle = false;
         };
 
+        // This uses the server's calculate api
         $scope.calculate = function(){
             var calculate_url = 'http://localhost:5000/api/calculate';
             if ($scope.exposure.exposure_name == null){
@@ -98,7 +100,6 @@ module.controller('WebsafeCtrl', [
                 if (($scope.exposure.exposure_title != '') || ($scope.hazard.hazard_title != '')){
                     $scope.l = Ladda.create( document.querySelector( '.ladda-button' ) );
                     $scope.l.start();
-                    $scope.loaded = false;
 
                     $http.get(calculate_url, {params: {
                         'exposure_title' : $scope.exposure.exposure_title,
@@ -107,19 +108,24 @@ module.controller('WebsafeCtrl', [
                     }}).success(function(data, status, headers, config) {
                         $scope.l.stop();
                         $scope.resultReady = true;
-                        $scope.loaded = true;
                         $scope.html = data.html;
                         $scope.impact.impact_resource = data.layer.resource;
 
                         MapFunctions.removeAllWMSLayers();
+                        $scope.hazard.showLegend = false;
+                        $scope.exposure.showLegend = false;
+
                         var impact_layer = MapFunctions.fetchWMSLayer(data.layer.resource);
+                        $scope.impact.legend = MapFunctions.getLegend(data.layer.resource);
                         $rootScope.map.addLayer(impact_layer);
+                        $scope.impact.showLegend = true;
+                        $('.legend_impact').draggable();
                         MapFunctions.zoomToExtent($rootScope.extent);
-                        $scope.open();
+                        $scope.open();              // open the result modal
                     }).error(function(data, status, headers, config) {
                         $scope.l.stop();
                         alert('An internal server error(500) has occurred!');
-                    })
+                    });
                 }else{
                     alert('An error has occurred!');
                 }
@@ -176,12 +182,13 @@ module.controller('FileTreeCtrl', [
                     $http.get(api_url, {params: {'api': resource_link }})
                     .success(function(data, status, headers, config) {
                         if ((data.featureType == null) && (data.coverage == null)){
-                            alert("Layer not available.");
+                            alert("Layer is not of type exposure or hazard.");
                         }else if (data.coverage != null){
                             var bbox = data.coverage.nativeBoundingBox;
                             var extent = [bbox.minx, bbox.miny, bbox.maxx, bbox.maxy];
                             $rootScope.extent = extent;
                             layer_info.layer = MapFunctions.fetchWMSLayer(layer.name);
+                            layer_info.legendUrl = MapFunctions.getLegend(layer.name);
                             MapFunctions.zoomToExtent(extent);
 
                             layer_info.title = data.coverage.title;
@@ -195,6 +202,7 @@ module.controller('FileTreeCtrl', [
                             }
 
                             layer_info.layer = MapFunctions.fetchWMSLayer(layer.name);
+                            layer_info.legendUrl = MapFunctions.getLegend(layer.name);
                             MapFunctions.zoomToExtent(extent);
 
                             layer_info.title = data.featureType.title;

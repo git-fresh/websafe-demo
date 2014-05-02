@@ -48,24 +48,6 @@ module.factory('MapFunctions', [
                 return map.getLayers().array_;
             },
 
-            getselectLayers : function(){
-                var layers = [];
-
-                map.getLayers().forEach(function(layer) {
-                    /*
-                    if (!(layer.source_ instanceof ol.source.OSM) &&
-                        layer.get('metadata') &&
-                        (layer.get('visible')) && // don't return layers that are not visible
-                        !(layer.get('metadata').hidden) &&  // don't get 'internal' layers such as the feature modify vector layer
-                        !(layer.get('metadata').differences_layer)){
-                            layers.push(layer);
-                    }
-                    */
-                });
-
-                return layers;
-            },
-
             removeAllWMSLayers : function(){
                 var layer_array = [];
 
@@ -104,6 +86,14 @@ module.factory('MapFunctions', [
 
                 view.setResolution(resolution);
                 view.setCenter(ol.proj.transform(center, 'EPSG:4326', 'EPSG:3857'));
+            },
+
+            getLegend : function(layer_name){
+                var url = geoserver_url + '?REQUEST=GetLegendGraphic&VERSION=' +
+                        version + '&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=' +
+                        layer_name + '&LEGEND_OPTIONS=forceLabels:on;';
+
+                return url;
             }
         }
     }

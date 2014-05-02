@@ -79,18 +79,26 @@ def upload_to_geoserver(impact_file_path):
     else:
         return data
 
+""" Set the style of the layer with name: layer_name
+"""
 def set_style(layer_name, style):
-    cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
-    layer = cat.get_layer(layer_name)
+    try:
+        cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
+        layer = cat.get_layer(layer_name)
 
-    if style is None:
-        print 'No style specified!'
-        return
+        if style is None:
+            print 'No style specified!'
+            return
     
-    style = cat.get_style(style, GEOSERVER_WORKSPACE)
-    layer.default_style = style
-    cat.save(layer)
+        style = cat.get_style(style, GEOSERVER_WORKSPACE)
+        layer.default_style = style
+        cat.save(layer)
+    except:
+        raise
 
+""" Make SLD styles based on style_info(dict of style classes)
+    and upload on Geoserver. 
+"""
 def make_style(style_name, style_info):
     cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
     style_dir = path('data/styles')
@@ -131,7 +139,6 @@ def make_style(style_name, style_info):
         fill.create_cssparameter('fill', x['colour'])
         fill.create_cssparameter('fill-opacity', '0.5')
 
-    #print sld_doc.as_sld(True)
     with open(style_file_path, 'w') as style:
         style.write(sld_doc.as_sld(True))
         style.close()

@@ -67,9 +67,9 @@ code {
 
 /* Location of the NOAH logo at top left (size already modified via PS) */
 #noah-logo {
-	padding: 5px;
-	margin-left: 5px;
-	float: left;
+  padding: 5px;
+  margin-left: 5px;
+  float: left;
 }
 
 /* fixed toolbar location and transparency */
@@ -258,15 +258,6 @@ code {
   color: #008EF1;
   background: url('../img/selector-test3.png') no-repeat 8px 2px transparent;
 }
-
-/*
-#menulevel2 {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    z-index: 100;
-}
-*/
 
 li.selected-flood {
   float: left;

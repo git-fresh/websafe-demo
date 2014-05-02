@@ -256,12 +256,10 @@ def start_geoserver(options):
     web_app = path('geoserver/geoserver').abspath()
     log_file = path('geoserver/jetty.log').abspath()
     config = path('scripts/jetty-runner.xml').abspath()
-    # @todo - we should not have set workdir to the datadir but a bug in geoserver
-    # prevents geonode security from initializing correctly otherwise
+
     with pushd(data_dir):
         sh(('java -Xmx512m -XX:MaxPermSize=256m'
             ' -DGEOSERVER_DATA_DIR=%(data_dir)s'
-            # workaround for JAI sealed jar issue and jetty classloader
             ' -Dorg.eclipse.jetty.server.webapp.parentLoaderPriority=true'
             ' -jar %(jetty_runner)s'
             ' --log %(log_file)s'

@@ -1,26 +1,16 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<StyledLayerDescriptor version="1.0.0" 
- xsi:schemaLocation="http://www.opengis.net/sld StyledLayerDescriptor.xsd" 
- xmlns="http://www.opengis.net/sld" 
- xmlns:ogc="http://www.opengis.net/ogc" 
- xmlns:xlink="http://www.w3.org/1999/xlink" 
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <!-- a Named Layer is the basic building block of an SLD document -->
+<?xml version="1.0" encoding="UTF-8"?>
+<StyledLayerDescriptor xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.1.0/StyledLayerDescriptor.xsd" xmlns:se="http://www.opengis.net/se">
   <NamedLayer>
-    <Name>bldg_footprints</Name>
+    <Name>Building Footprints</Name>
     <UserStyle>
-    <!-- Styles can have names, titles and abstracts -->
-      <Title>Building Footprints</Title>
-      <Abstract>A sample style for drawing building footprint polygons</Abstract>
-      <!-- FeatureTypeStyles describe how to render different features -->
-      <!-- A FeatureTypeStyle for rendering polygons -->
+      <Name>Building Footprints</Name>
       <FeatureTypeStyle>
         <Rule>
-          <Name>rule1</Name>
+          <Name>Buildings</Name>
           <PolygonSymbolizer>
             <Fill>
-              <CssParameter name="fill">#009999</CssParameter>
-              <CssParameter name="fill-opacity">0.5</CssParameter>
+              <SvgParameter name="fill">#009999</SvgParameter>
+              <SvgParameter name="fill-opacity">0.5</SvgParameter >
             </Fill>
           </PolygonSymbolizer>
         </Rule>

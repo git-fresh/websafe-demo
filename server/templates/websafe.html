@@ -10,7 +10,6 @@
                     </li>
                 </ul>
             </div>
-
             
             <legend>
                 <label>Question</label>
@@ -84,4 +83,19 @@
             <button class="btn btn-warning" ng-click="close()">Close</button>
         </div>
     </script>
+</div>
+
+<div class="legend legend_exposure" ng-show="exposure.showLegend">
+    <h4>Exposure</h4>
+    <img id="exposure_legend" ng-src="{{! exposure.legend }}">
+</div>
+
+<div class="legend legend_hazard" ng-show="hazard.showLegend">
+    <h4>Hazard</h4>
+    <img id="hazard_legend" ng-src="{{! hazard.legend }}">
+</div>
+
+<div class="legend legend_impact" ng-show="impact.showLegend">
+    <h4>Impact</h4>
+    <img id="impact_legend" ng-src="{{! impact.legend }}">
 </div>
