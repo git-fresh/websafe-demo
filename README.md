@@ -58,6 +58,9 @@ after changing the password to 'projectnoah', run this command in the command li
 to upload all the data for the demo:
     
     % paver setup_data
+    
+after setting up the data, allow the webLogin -> j_spring_security_check to create HTTP sessions.
+This can be done by going in the Security -> Authentication section in the sidebar while logged in to Geoserver.
 
 ## Manually running Geoserver
 
