@@ -19,6 +19,7 @@ module.controller('MapCtrl', function($scope, $rootScope){
             'rest/services/World_Topo_Map/MapServer">ArcGIS</a>'
     });
 
+    /*
     layers.push(
         new ol.layer.Tile({
             preload: Infinity,
@@ -27,7 +28,18 @@ module.controller('MapCtrl', function($scope, $rootScope){
             })
         })  
     );
+    */
     
+    layers.push(
+        new ol.layer.Tile({
+            preload: Infinity,
+            source: new ol.source.BingMaps({
+                key: 'AqNJQ7F0LgqtsrECYKwo3ijiZyyDhrT2LF3GcP3zmi_DPTGlwJE8cx__OvSQlijW',
+                imagerySet: 'Road'
+            })
+        })
+    );
+        
     //this initializes the map
     $rootScope.map = new ol.Map({
         target: 'map',
