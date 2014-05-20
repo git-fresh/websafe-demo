@@ -118,6 +118,7 @@ class CalculateHandler(tornado.web.RequestHandler):
                         'store'    : GEOSERVER_STORE,
                         'resource' : impact_base_name
                         }
+                print_pdf(html, impact_base_name)
                 data = {'return':'ok', 'layer': layer, 'html' : f}
             else:
                 try:

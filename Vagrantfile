@@ -40,8 +40,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vb.customize ["modifyvm", :id, "--memory", "4096"]
   end
   
-  config.vm.provision :puppet, :module_path => module_path do |puppet|
-    puppet.manifests_path = "puppet"
-    puppet.manifest_file  = "init.pp"
-  end
+  #config.vm.provision :puppet, :module_path => module_path do |puppet|
+  #  puppet.manifests_path = "puppet"
+  #  puppet.manifest_file  = "init.pp"
+  #end
+  
+  config.vm.provision "shell", path: "init.sh"
 end

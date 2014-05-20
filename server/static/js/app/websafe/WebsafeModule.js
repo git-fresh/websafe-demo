@@ -173,6 +173,8 @@ module.controller('FileTreeCtrl', [
                     layer_info.type = 'exposure';
                 }else if (resource_link.indexOf("/impact/") != -1){
                     layer_info.type = 'impact';
+                }else if (data.layer.name == 'tacloban_landslide'){
+                    layer_info.type = 'hazard';
                 }else{
                     layer_info.type = 'exposure';
                 }

@@ -67,7 +67,8 @@ module.factory('MapFunctions', [
             zoomToExtent : function(extent){
                 var center = ol.extent.getCenter(extent);
                 var resolution = view.getResolutionForExtent(extent, map.getSize());
-                resolution = view.constrainResolution(resolution, 0, 0) * 100;
+                //resolution = view.constrainResolution(resolution, 0, 0) * 100;
+                resolution = 40;
                 var duration = 2000;
                 var start = +new Date();
 

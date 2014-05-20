@@ -73,9 +73,9 @@ class weasyprint {
   }
 }
 
-class {'update':}
-class {'server_dependencies':}
-class {'inasafe':}
-class {'weasyprint':}
+#class {'update':}
+#class {'server_dependencies':}
+#class {'inasafe':}
+#class {'weasyprint':}
 
-Class['update'] -> Class['server_dependencies'] -> Class['inasafe'] -> Class['weasyprint']
+#Class['update'] -> Class['server_dependencies'] -> Class['inasafe'] -> Class['weasyprint']
