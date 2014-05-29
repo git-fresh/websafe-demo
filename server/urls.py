@@ -1,5 +1,5 @@
-from handlers.handlers import IndexHandler, WebsafeHandler, LayersHandler, \
-	CalculateHandler, ImpactPdfHandler
+from handlers.handlers import IndexHandler, WebsafeHandler, LayersHandler
+from handlers.websafe_handlers import CalculateHandler, ImpactPdfHandler
 
 import os.path
 import tornado.web

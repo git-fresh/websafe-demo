@@ -1,7 +1,6 @@
 (function(){
 
 var module = angular.module('websafe_module', [
-    'utils',
     'config',
     'map_service',
     'ui.bootstrap',
@@ -145,12 +144,11 @@ module.controller('FileTreeCtrl', [
     '$element',
     '$http',
     '$rootScope',
-    'Base64',
     'MapFunctions',
-    function ($scope, $element, $http, $rootScope, Base64, MapFunctions){
+    function ($scope, $element, $http, $rootScope, MapFunctions){
         var base_url = 'http://localhost:';
         var url = base_url + '8080/geoserver/rest/layers.json';
-        var api_url = 'api/layers';
+        var api_url = base_url + '5000/api/layers';
 
         // populate the file tree with all the available layers from geoserver
         $http.get(api_url, {params: {'api': url }})

@@ -10,7 +10,7 @@
           <PolygonSymbolizer>
             <Fill>
               <SvgParameter name="fill">#009999</SvgParameter>
-              <SvgParameter name="fill-opacity">0.5</SvgParameter >
+              <SvgParameter name="fill-opacity">0.7</SvgParameter >
             </Fill>
           </PolygonSymbolizer>
         </Rule>
