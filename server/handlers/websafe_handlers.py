@@ -1,5 +1,6 @@
 import tornado.web
 import os, sys, json
+import requests
 
 
 from safe.api import read_layer, calculate_impact

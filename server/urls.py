@@ -14,7 +14,7 @@ handlers += [
     (r"/api/websafe", WebsafeHandler),
     (r"/api/layers", LayersHandler),
     (r"/api/calculate", CalculateHandler),
-    (r"/api/pdf", ImpactPdfHandler),
+    (r"/api/pdf", ImpactPdfHandler)
 ]
 
 class Application(tornado.web.Application):

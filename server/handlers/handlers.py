@@ -48,9 +48,6 @@ class LayersHandler(tornado.web.RequestHandler):
     def get(self):
         temp_url = 'http://localhost:8080/geoserver/rest/layers.json'
         try:
-            cat = Catalog(GEOSERVER_REST_URL, username=GS_USERNAME, password=GS_PASSWORD)
-            all_layers = cat.get_layers()
-        
             url = self.get_argument("api", temp_url)
 
             headers = {'Accept': '*/*'}

@@ -4,6 +4,7 @@
 /server/data/impact/*
 /server/data/impact summary/*
 /server/data/impact report/*
+/frontend/*
 
 *.pyc
 StyledLayerDescriptor-backup.xsd
