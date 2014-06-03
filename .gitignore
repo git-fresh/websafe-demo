@@ -1,6 +1,8 @@
 /.vagrant/*
 /server/geoserver/*
 /server/downloaded/*
+/geoserver/*
+/downloaded/*
 /server/data/impact/*
 /server/data/impact summary/*
 /server/data/impact report/*

@@ -54,8 +54,8 @@ password to `projectnoah` for the root found in:
 
     % /vagrant/server/geoserver/data/security/masterpw.info
 
-after changing the password to 'projectnoah', run this command in the command line
-to upload all the data for the demo:
+after changing the password to 'projectnoah', upload all the styles in "data/styles" folder
+to geoserver and then finally run this command in the command line to upload all the data for the demo:
     
     % paver setup_data
     

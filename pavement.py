@@ -9,9 +9,8 @@ from geoserver.catalog import Catalog
 '''
 Define all Geoserver and file directory constants
 '''
-ROOT = os.path.dirname(__file__)
-
-DATA_PATH = os.path.join(ROOT, 'data')
+ROOT = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(ROOT, 'server', 'data')
 
 GS_USERNAME = "root"
 GS_PASSWORD = "projectnoah"
@@ -19,8 +18,10 @@ GS_PASSWORD = "projectnoah"
 GEOSERVER_BASE_URL = 'http://localhost:8080/geoserver/'
 GEOSERVER_REST_URL = GEOSERVER_BASE_URL + 'rest'
 
-GEOSERVER_WORKSPACE = 'websafe'
-GEOSERVER_STORE = 'impact'
+GS_DEFAULT_WS = 'websafe'
+GS_EXPOSURE_WS = 'exposure'
+GS_HAZARD_WS = 'hazard'
+GS_IMPACT_WS = 'impact'
 
 try:
     from paver.path import pushd
@@ -110,104 +111,46 @@ def setup():
 
 @task
 def setup_data():
-    haz_conn_params =  {
-        'cache and reuse memory maps': 'true', 
-        'namespace': 'http://inasafe.org', 
-        'filetype': 'shapefile', 
-        'charset': 'ISO-8859-1', 
-        'create spatial index': 'true', 
-        'fstype': 'shape', 
-        'url': 'file:///vagrant/server/data/hazard', 
-        'enable spatial index': 'true', 
-        'memory mapped buffer': 'false', 
-        'timezone': 'Etc/UTC'
-    }
-    exp_conn_params =  {
-        'cache and reuse memory maps': 'true', 
-        'namespace': 'http://inasafe.org', 
-        'filetype': 'shapefile', 
-        'charset': 'ISO-8859-1', 
-        'create spatial index': 'true', 
-        'fstype': 'shape', 
-        'url': 'file:///vagrant/server/data/exposure', 
-        'enable spatial index': 'true', 
-        'memory mapped buffer': 'false', 
-        'timezone': 'Etc/UTC'
-    }
-    impact_conn_params =  {
-        'cache and reuse memory maps': 'true', 
-        'namespace': 'http://inasafe.org', 
-        'filetype': 'shapefile', 
-        'charset': 'ISO-8859-1', 
-        'create spatial index': 'true', 
-        'fstype': 'shape', 
-        'url': 'file:///vagrant/server/data/impact', 
-        'enable spatial index': 'true', 
-        'memory mapped buffer': 'false', 
-        'timezone': 'Etc/UTC'
-    }
 
     try:
         cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
-        cat.create_workspace(GEOSERVER_WORKSPACE, 'http://inasafe.org')
-        cat.set_default_workspace(GEOSERVER_WORKSPACE)
 
-        haz_store = cat.create_datastore('hazard')
-        haz_store.type = 'Directory of spatial files (shapefiles)'
-        haz_store.connection_parameters = haz_conn_params
-        cat.save(haz_store)
-
-        exp_store = cat.create_datastore('exposure')
-        exp_store.type = 'Directory of spatial files (shapefiles)'
-        exp_store.connection_parameters = exp_conn_params
-        cat.save(exp_store)
-
-        impact_store = cat.create_datastore('impact')
-        impact_store.type = 'Directory of spatial files (shapefiles)'
-        impact_store.connection_parameters = impact_conn_params
-        cat.save(impact_store)
+        # Create the workspaces in geoserver
+        exp_ws = cat.create_workspace(GS_EXPOSURE_WS, 'exposure')
+        haz_ws = cat.create_workspace(GS_HAZARD_WS, 'hazard')
+        impact_ws = cat.create_workspace(GS_IMPACT_WS, 'impact')
+        cat.set_default_workspace(GS_IMPACT_WS)
 
         exposure_dir = os.path.join(DATA_PATH, 'exposure')
         hazard_dir = os.path.join(DATA_PATH, 'hazard')
 
-        upload_layer(str(os.path.join(exposure_dir, 'quiapo_bldgs.shp')), 'exposure')
-        upload_layer(str(os.path.join(exposure_dir, 'tacloban_bldgs.shp')), 'exposure')
-        upload_raster(str(os.path.join(exposure_dir, 'tacloban_pop.tif')), 'exposure')
+        upload_vector(str(os.path.join(exposure_dir, 'quiapo_buildings.shp')), exp_ws)
+        upload_vector(str(os.path.join(exposure_dir, 'tacloban_buildings.shp')), exp_ws)
+        upload_raster(str(os.path.join(exposure_dir, 'tacloban_pop.tif')), exp_ws)
 
-        upload_layer(str(os.path.join(hazard_dir, 'quiapo_flood.shp')), 'hazard')
-        upload_layer(str(os.path.join(hazard_dir, 'tacloban_flood.shp')), 'hazard')
-        
-        '''
-        # upload the styles in data/styles folder
-        upload_style('Building Footprints')
-        upload_style('Flood Hazard Quiapo')
-        upload_style('Flood Hazard')
-        upload_style('Flood-Building')
-        upload_style('Population Exposure')
+        upload_vector(str(os.path.join(hazard_dir, 'tacloban_100.shp')), haz_ws)
+        upload_vector(str(os.path.join(hazard_dir, 'quiapo_100.shp')), haz_ws)
+        upload_vector(str(os.path.join(hazard_dir, 'tacloban_stormsurge.shp')), haz_ws)
 
-        # set styles for each layer uploaded
-        set_style('quiapo_flood', "Flood Hazard Quiapo")
-        set_style('tacloban_flood', "Flood Hazard")
-        set_style('quiapo_bldgs', "Building Footprints")
-        set_style('tacloban_bldgs', "Building Footprints")
         set_style('tacloban_pop', "Population Exposure")
-        '''
+        set_style('quiapo_100', "Flood Hazard Quiapo")
+        set_style('tacloban_100', "Flood Hazard")
+        set_style('tacloban_stormsurge', "Flood Hazard")
+        set_style('quiapo_buildings', "Building Footprints")
+        set_style('tacloban_buildings', "Building Footprints")
 
     except:
         print 'Error in setting up geoserver test environment.'
         raise
 
-def upload_layer(file_path, store):
+def upload_vector(shp, workspace):
     data = dict()
     try:
         cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
-        ws = cat.get_workspace(GEOSERVER_WORKSPACE)
-        ds = cat.get_store(store)
 
-        base = str(os.path.splitext(file_path)[0])
+        base = str(os.path.splitext(shp)[0])
         name = str(os.path.splitext(os.path.basename(base))[0])
 
-        shp = file_path
         shx = base + '.shx'
         dbf = base + '.dbf'
         prj = base + '.prj'
@@ -217,33 +160,32 @@ def upload_layer(file_path, store):
                  'dbf' : dbf,
                  'prj' : prj
                }
-        cat.add_data_to_store(ds, name, data, ws, True)
+
+        cat.create_featurestore(name, data, workspace, True)
     except:
         raise
 
-def upload_raster(file_path, store):
+def upload_raster(file_path, workspace):
     data = dict()
     try:
         cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
-        ws = cat.get_workspace(GEOSERVER_WORKSPACE)
-        ds = cat.get_store(store)
 
         base = str(os.path.splitext(file_path)[0])
         name = str(os.path.splitext(os.path.basename(base))[0])
 
-        cat.create_coveragestore(name, file_path, ws, True)
+        cat.create_coveragestore(name, file_path, workspace, True)
     except:
         raise
 
 def upload_style(style_name):
     try:
         cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
-        style_dir = path('data/styles')
+
         style_filename = style_name + '.sld'
         style_file_path = str(os.path.join(DATA_PATH, 'styles', style_filename))
 
         with open(style_file_path, 'r') as style:
-            cat.create_style(style_name, style.read(), workspace=GEOSERVER_WORKSPACE, overwrite=True)
+            cat.create_style(style_name, style.read(), overwrite=True)
             style.close()
     except:
         raise
@@ -258,7 +200,7 @@ def start_geoserver(options):
     config = path('scripts/jetty-runner.xml').abspath()
 
     with pushd(data_dir):
-        sh(('java -Xmx512m -XX:MaxPermSize=256m'
+        sh(('java -Xmx512m -XX:MaxPermSize=1024m'
             ' -DGEOSERVER_DATA_DIR=%(data_dir)s'
             ' -Dorg.eclipse.jetty.server.webapp.parentLoaderPriority=true'
             ' -jar %(jetty_runner)s'
@@ -353,11 +295,7 @@ def justcopy(origin, target):
 def set_style(layer_name, style):
     cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
     layer = cat.get_layer(layer_name)
-
-    if style is None:
-        print 'No style specified!'
-        return
     
-    style = cat.get_style(style, GEOSERVER_WORKSPACE)
+    style = cat.get_style(style)
     layer.default_style = style
     cat.save(layer)

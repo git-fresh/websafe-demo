@@ -15,8 +15,6 @@ from settings import (
     GEOSERVER_COOKIE_URL
 )
 
-from utilities import make_data_dirs, upload_to_geoserver, print_pdf, \
-    set_style, make_style
 from geoserver.catalog import Catalog
 
 
