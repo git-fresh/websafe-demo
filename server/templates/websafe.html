@@ -1,14 +1,48 @@
-<div class="inasafe_window">
+<div class="websafe_window">
+    <a class="return" href="#/" title="Close Menu"></a>
+
+    <div class="filetree exposure-filetree">
+        <select style="width:300px" ui-select2="exposure_selector"
+                data-placeholder="Select exposure layer"
+                ng-model="exposure.name"
+                ng-change="exposureChanged(exposure)">
+            <option value=""></option>
+            <option ng-repeat="layer in exposure_list" value="{{! layer.name }}">
+                {{! layer.name }}
+            </option>
+        </select>
+    </div>
+
+    <div class="filetree hazard-filetree">
+        <select style="width:300px" ui-select2="hazard_selector"
+                data-placeholder="Select hazard layer"
+                ng-model="hazard.name"
+                ng-change="hazardChanged(hazard)">
+            <option value=""></option>
+            <option ng-repeat="layer in hazard_list" value="{{! layer.name }}">
+                {{! layer.name }}
+            </option>
+        </select>
+    </div>
+
     <div class="container">
-        <img ng-src="{{ static_url("img/logo.png") }}" style="width:100%;">
+        <!-- TODO: remove inline css -->
+        <img ng-src="{{ static_url("img/websafe/logo.png") }}" style="width:100%;padding-top:5px;">
         
-        <div ng-show="!help_toggle"> 
-            <div class="filetree panel panel-primary" ng-controller="FileTreeCtrl">
-                <ul class="jqueryFileTree" >
-                    <li ng-repeat="layer in layers" class="file">
-                        <a href="" ng-click='showLayer(layer)'>{{! layer.name }}</a>
-                    </li>
-                </ul>
+        <div ng-show="!help_toggle">
+            <div class="info-board panel panel-primary">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Instructions</h3>
+                </div>
+                <div class="panel-body">
+                    <ol>
+                        <li>Choose an exposure layer</li>
+                        <li>Choose a hazard layer</li>
+                        <li>Click the 'Calculate' button</li>
+                    </ol>
+
+                    <a class="glyphicon glyphicon-question-sign"></a>
+                </div>
             </div>
             
             <legend>
@@ -16,11 +50,11 @@
             </legend>
         
             <label>In the event of:</label>
-            <input type="text" id="hazard" placeholder="Hazard" ng-model="hazard.hazard_name" disabled>
+            <input type="text" class="question-form-elements" placeholder="Hazard" ng-model="hazard.name" disabled>
             <label>How Many:</label>
-            <input type="text" id="exposure" placeholder="Exposure" ng-model="exposure.exposure_name" disabled>
+            <input type="text" class="question-form-elements" placeholder="Exposure" ng-model="exposure.name" disabled>
             <label>Will:</label><br/>
-            <select id="impact" 
+            <select class="question-form-elements" 
                 ng-init="impact.impact_function = impact_functions[0].value"
                 ng-model="impact.impact_function" 
                 ng-options="impact.value as impact.label for impact in impact_functions">
@@ -85,17 +119,12 @@
     </script>
 </div>
 
-<div class="legend legend_exposure" ng-show="exposure.showLegend">
-    <h4>Exposure</h4>
-    <img id="exposure_legend" ng-src="{{! exposure.legend }}">
-</div>
 
 <div class="legend legend_hazard" ng-show="hazard.showLegend">
     <h4>Hazard</h4>
-    <img id="hazard_legend" ng-src="{{! hazard.legend }}">
-</div>
-
-<div class="legend legend_impact" ng-show="impact.showLegend">
-    <h4>Impact</h4>
-    <img id="impact_legend" ng-src="{{! impact.legend }}">
+    <ul>
+        <li><span style="background: #ffff00;"></span>Low Hazard</li>
+        <li><span style="background: #e69800;"></span>Moderate Hazard</li>
+        <li><span style="background: #e60000;"></span>High Hazard</li>
+    </ul>
 </div>

@@ -4,8 +4,12 @@ import requests
 
 
 from safe.api import read_layer, calculate_impact
+
+# Flood Building Impact Function
 from safe.impact_functions.inundation.flood_OSM_building_impact \
     import FloodBuildingImpactFunction
+
+# Flood Population Evacuation Function
 from safe.impact_functions.inundation.flood_population_evacuation_polygon_hazard \
     import FloodEvacuationFunctionVectorHazard
 

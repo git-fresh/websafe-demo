@@ -4,7 +4,8 @@ var module = angular.module('noahApp', [
     'toolbar_module',
     'sidebar_module',
     'websafe_module',
-    'ngRoute'
+    'ngRoute',
+    'ngAnimate',
 ]);
 
 //configure the routing for the sidebar ng-view    
@@ -48,6 +49,7 @@ module.run(
                             $rootScope.navbar.height() -
                             $rootScope.footer.height();
             var sideMenuHeight = mapHeight - $rootScope.toolbar.height();
+            var websafeHeight = mapHeight - $rootScope.toolbar.height();
         
             $rootScope.mapdiv.height(mapHeight);
             $rootScope.map.updateSize();
@@ -55,8 +57,8 @@ module.run(
                 $('#sidemenu').css('height', sideMenuHeight); 
             }
             
-            if ($('.inasafe_window')) { 
-                $('.inasafe_window').css({'overflow': 'auto', 'height': sideMenuHeight});
+            if ($('.websafe_window')) { 
+                $('.websafe_window').css({'overflow': 'auto', 'height': websafeHeight});
             }
         });
     }

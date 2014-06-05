@@ -1,25 +1,34 @@
-.filetree {
-    margin: 5 0 0 0;
-    padding: 5 10 5 10;
-    height: 150px;
-    overflow: auto;
-    background-color: #BCC;
+
+.info-board {
+  margin: 5px 0px 0px 0px;
+  height: 170px;
+  background-color: #BCC;
 }
 
-.inasafe_window {
-  float: right;
-  position: fixed;
-  top: 90px;
-  right: 0px;
-  //padding-top: 5px;
-  height: 100%;
-  width: 250px;
-  background-color: rgba(0, 0, 0, 0.8);
-  //background-color: #FFF;
-  z-index: 2;
+.info-board h4 {
+  text-align: center;
 }
 
-.inasafe_window label {
+.info-board a {
+  position: relative;
+  left: 45%;
+  cursor: pointer;
+  cursor: hand;
+}
+
+.layer-list > li {
+  font-size: 11px;
+}
+
+.layer-list {
+  padding: .1em .1em .1em 1em !important;
+}
+
+.websafe_window {
+  overflow: auto;
+}
+
+.websafe_window label {
   color: #008EF1;
   padding-top: 5px;
 }
@@ -29,62 +38,91 @@
   overflow: auto;
 }
 
-#exposure, #hazard, #impact{
+.question-form-elements {
   width: 100%;
   font-size: 11px;
 }
 
-.inasafe_window legend {
-  margin-bottom: 10px;
+.filetree {
+  position: absolute;
 }
+
+.exposure-filetree {
+  margin-left: 230px;
+}
+
+.hazard-filetree {
+  margin-left: 500px;
+}
+
+/*
+ * CSS for the help 'page' component of WebSAFE
+*/
 
 .getting_started, .limitations {
   margin: 5 0 5 0;
 }
 
 .getting_started > .panel-heading,
-.limitations > .panel-heading  {
+.limitations > .panel-heading,
+.info-board > .panel-heading {
   padding: 5px 5px;
 }
 
 .getting_started > .panel-body,
-.limitations > .panel-body {
+.limitations > .panel-body, 
+.info-board > .panel-body {
   padding: 8px;
   font-size: 12px;
 }
 
-.limitations > .panel-body ol {
+.limitations > .panel-body ol,
+.info-board > .panel-body ol {
   padding-left: 20px;
 }
 
 .button_center {
-  margin: 15 0 10 0;
+  margin: 15px 0px 10px 0px;
   text-align: center;
 }
 
 .legend {
-    //background-color: #BCC;
-    position: absolute;
-    padding: 3px;
-    opacity: 0.7;
-    bottom: 30px;
-    z-index: 3;
-
-    cursor: all-scroll;
+  background-color: #BCC;
+  width: 120px;
+  height: 150px;
+  position: absolute;
+  padding: 3px;
+  opacity: 0.7;
+  bottom: 30px;
+  z-index: 3;
+  cursor: all-scroll;
 }
 
 .legend h4 {
   text-align: center;
 }
 
+.legend span {
+  width: 20px;
+  height: 20px;
+  float: left;
+  margin-right: 5px;
+  margin-left: 3px;
+  //padding: 3px;
+}
+
 .legend_exposure {
-    left: 60px;
+  left: 60px;
 }
 
 .legend_hazard {
-    left: 280px;
+  left: 280px;
 }
 
 .legend_impact {
-    left: 60px;
+  left: 60px;
+}
+
+legend {
+  margin: 0px !important;
 }
