@@ -9,9 +9,7 @@ var maxZoom = 18;
 var map = null;
 
 
-var module = angular.module('map_module', [
-    'map_service'
-]);
+var module = angular.module('map_module', []);
 
 module.controller('MapCtrl', function($scope, $rootScope){
     attribution = new ol.Attribution({

@@ -1,7 +1,6 @@
 (function(){
 
 var module = angular.module('websafe_module', [
-    'map_service',
     'websafe_service',
     'ui.bootstrap',
     'ui.select2',
@@ -27,17 +26,16 @@ module.controller('ModalCtrl', [
 
 module.controller('WebsafeCtrl', [
     '$scope',
-    '$http',
     '$window',
     '$rootScope',
     'MapFunctions',
     'WebsafeFunctions',
     'WebsafeConfig',
-    function($scope, $http, $window, $rootScope, MapFunctions, WebsafeFunctions, WebsafeConfig){
+    function($scope, $window, $rootScope, MapFunctions, WebsafeFunctions, WebsafeConfig){
         $scope.init = function(){
             $scope.help_toggle = false;
-            $scope.hazard = {};
-            $scope.exposure = {};
+            $scope.hazard = { type: 'haz' };
+            $scope.exposure = { type: 'exp' };
             $scope.impact_functions = WebsafeConfig.impact_functions;
             $scope.impact = {impact_function : WebsafeConfig.impact_functions[0].value};
             $scope.html = '';
@@ -63,24 +61,6 @@ module.controller('WebsafeCtrl', [
                 scope: $scope
             });
         };
-
-        // This is a listener for changes in layer(exposure or hazard)
-        var layer_change_listener = $rootScope.$on('layer changed', function(event, layer_info){
-            if (layer_info.type == 'hazard'){
-                $scope.hazard.hazard_name = layer_info.name;
-                $scope.hazard.hazard_title = layer_info.title;
-                $scope.hazard.layer = layer_info.layer;
-            }else if (layer_info.type == 'exposure'){
-                $scope.exposure.exposure_name = layer_info.name;
-                $scope.exposure.exposure_title = layer_info.title;
-                $scope.exposure.layer = layer_info.layer;
-                $scope.exposure.legend = layer_info.legendUrl;
-                $scope.exposure.showLegend = true;
-                $('.legend_exposure').draggable();
-            }
-            $rootScope.map.addLayer(layer_info.layer);
-        });
-        $scope.$on('$destroy', layer_change_listener);      // this unbinds the listener when the scope is destroyed
         */
 
         MapFunctions.fetchLayers(WebsafeConfig.exposure_url)
@@ -88,32 +68,28 @@ module.controller('WebsafeCtrl', [
         MapFunctions.fetchLayers(WebsafeConfig.hazard_url)
             .then(function(data){ $scope.hazard_list = data; });
 
-        //
-        $scope.hazardChanged = function(hazard){
-            if (hazard.name != ''){
-                if ($scope.hazard.layer != null){
-                    $rootScope.map.removeLayer($scope.hazard.layer);
+        $scope.layerChanged = function(layer){
+            if (layer.name != ''){
+                if (layer.layer != null){
+                    $rootScope.map.removeLayer(layer.layer);
                 }
 
-                $scope.hazard.resource_name = "hazard:" + hazard.name;
-                MapFunctions.fetchBbox($scope.hazard.resource_name)
+                layer.resource_name = layer.type == "haz" ?
+                    "hazard:" + layer.name : "exposure:" + layer.name;
+                MapFunctions.fetchBbox(layer.resource_name)
                     .then(function(extent){
-                        console.log(extent);
                         MapFunctions.zoomToExtent(extent);
                     });
 
-                $scope.hazard.layer = MapFunctions.fetchWMSLayer($scope.hazard.resource_name);
-                //$scope.hazard.legend = MapFunctions.getLegend(data.resource_name);
-                $rootScope.map.addLayer($scope.hazard.layer);
+                layer.layer = MapFunctions.fetchWMSLayer(layer.resource_name);
+                layer.legend = MapFunctions.getLegend(layer.resource_name);
+                $rootScope.map.addLayer(layer.layer);
 
                 //make legends function by getting sld
-                //$('.legend_hazard').draggable();
-                //$scope.hazard.showLegend = true;
+                $('.legend_hazard').draggable();
+                $('.legend_exposure').draggable();
+                layer.showLegend = true;
             }
-        };
-
-        $scope.exposureChanged = function(exposure){
-            var data = {};
         };
 
         $scope.calculate = function(){

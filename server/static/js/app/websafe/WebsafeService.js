@@ -66,7 +66,6 @@ module.factory('MapFunctions', [
                             deferred.resolve(layer.BoundingBox[0].extent);
                         }
                     }
-                    deferred.resolve(extent);
                 }).error(function(data, status, headers, config){
                     console.log('Fetching Bounding Box from GeoServer failed!');
                 });

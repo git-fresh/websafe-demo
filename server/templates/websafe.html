@@ -5,7 +5,7 @@
         <select style="width:300px" ui-select2="exposure_selector"
                 data-placeholder="Select exposure layer"
                 ng-model="exposure.name"
-                ng-change="exposureChanged(exposure)">
+                ng-change="layerChanged(exposure)">
             <option value=""></option>
             <option ng-repeat="layer in exposure_list" value="{{! layer.name }}">
                 {{! layer.name }}
@@ -17,7 +17,7 @@
         <select style="width:300px" ui-select2="hazard_selector"
                 data-placeholder="Select hazard layer"
                 ng-model="hazard.name"
-                ng-change="hazardChanged(hazard)">
+                ng-change="layerChanged(hazard)">
             <option value=""></option>
             <option ng-repeat="layer in hazard_list" value="{{! layer.name }}">
                 {{! layer.name }}
@@ -119,7 +119,7 @@
     </script>
 </div>
 
-
+<!--
 <div class="legend legend_hazard" ng-show="hazard.showLegend">
     <h4>Hazard</h4>
     <ul>
@@ -127,4 +127,19 @@
         <li><span style="background: #e69800;"></span>Moderate Hazard</li>
         <li><span style="background: #e60000;"></span>High Hazard</li>
     </ul>
+</div>
+-->
+<div class="legend legend_exposure" ng-show="exposure.showLegend">
+    <h4>Exposure</h4>
+    <img id="exposure_legend" ng-src="{{! exposure.legend }}">
+</div>
+
+<div class="legend legend_hazard" ng-show="hazard.showLegend">
+    <h4>Hazard</h4>
+    <img id="hazard_legend" ng-src="{{! hazard.legend }}">
+</div>
+
+<div class="legend legend_impact" ng-show="impact.showLegend">
+    <h4>Impact</h4>
+    <img id="impact_legend" ng-src="{{! impact.legend }}">
 </div>
