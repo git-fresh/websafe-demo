@@ -11,5 +11,6 @@ GEOSERVER_BASE_URL = 'http://localhost:8080/geoserver/'
 GEOSERVER_REST_URL = GEOSERVER_BASE_URL + 'rest'
 GEOSERVER_COOKIE_URL = GEOSERVER_BASE_URL +'j_spring_security_check'
 
-GEOSERVER_WORKSPACE = 'websafe'
-GEOSERVER_STORE = 'impact'
+GS_EXPOSURE_WS = 'exposure'
+GS_HAZARD_WS = 'hazard'
+GS_IMPACT_WS = 'impact'

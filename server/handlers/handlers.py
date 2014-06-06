@@ -1,17 +1,13 @@
 import tornado.web
-import os, sys, json
+import json
 import requests
 
 from urllib import urlencode
 from httplib2 import Http
 
 from settings import (
-    GEOSERVER_REST_URL,
     GS_USERNAME,
     GS_PASSWORD,
-    GEOSERVER_WORKSPACE,
-    GEOSERVER_STORE,
-    DATA_PATH,
     GEOSERVER_COOKIE_URL
 )
 

@@ -5,7 +5,7 @@ var module = angular.module('noahApp', [
     'sidebar_module',
     'websafe_module',
     'ngRoute',
-    'ngAnimate',
+    'ngAnimate'
 ]);
 
 //configure the routing for the sidebar ng-view    

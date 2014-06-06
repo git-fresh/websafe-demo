@@ -109,7 +109,7 @@ module.factory('MapFunctions', [
                 var center = ol.extent.getCenter(extent);
                 var resolution = view.getResolutionForExtent(extent, map.getSize());
                 resolution = 40;
-                var duration = 2000;
+                var duration = 1500;
                 var start = +new Date();
 
                 var pan = ol.animation.pan({
@@ -151,7 +151,8 @@ module.factory('WebsafeFunctions', [
             calculate : function(params){
                 var deferred = $q.defer();
 
-                $http.get(WebsafeConfig.calculate_url, {params : params}).success(function(data, status, headers, config) {
+                $http.get(WebsafeConfig.calculate_url, {params : params})
+                .success(function(data, status, headers, config) {
                     deferred.resolve(data);
                 }).error(function(data, status, headers, config){
                     deferred.reject(status);

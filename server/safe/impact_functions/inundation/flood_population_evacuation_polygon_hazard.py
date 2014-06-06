@@ -14,7 +14,7 @@ Contact : ole.moller.nielsen@gmail.com
 """
 
 __author__ = 'Ole Nielson'
-__revision__ = '11c37a0af8e588edd2ade7982aaadec63dfb0368'
+__revision__ = '55dc392b131ce0fa41f8473bced178d5bc10730a'
 __date__ = '10/01/2011'
 __copyright__ = ('Copyright 2012, Australia Indonesia Facility for '
                  'Disaster Reduction')

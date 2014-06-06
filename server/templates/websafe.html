@@ -36,9 +36,9 @@
                 </div>
                 <div class="panel-body">
                     <ol>
-                        <li>Choose an exposure layer</li>
-                        <li>Choose a hazard layer</li>
-                        <li>Click the 'Calculate' button</li>
+                        <li>Choose exposure layer</li>
+                        <li>Choose hazard layer</li>
+                        <li>Press 'Calculate'</li>
                     </ol>
 
                     <a class="glyphicon glyphicon-question-sign"></a>
@@ -59,15 +59,17 @@
                 ng-model="impact.impact_function" 
                 ng-options="impact.value as impact.label for impact in impact_functions">
             </select>
-        
-            <div class="button_center">
-                <button class="btn btn-danger btn-sm" ng-click="init()">Reset</button>
 
-                <!-- still have to change this to something that is not expand-left -->
-                <button class="btn btn-primary btn-sm ladda-button" data-style="expand-left" ng-click="calculate()" ng-hide="resultReady">
+            <div class="button_center">
+                <button class="btn btn-primary btn-sm ladda-button" data-style="expand-left"
+                    ng-click="calculate()" ng-hide="resultReady">
                     <span class="ladda-label">Calculate</span>
                 </button>
                 <button class="btn btn-primary btn-sm" ng-click="open()" ng-show="resultReady">Show Report</button>
+            </div>
+            
+            <div class="button_center">
+                <button class="btn btn-danger btn-sm" ng-click="init()">Reset</button>
             </div>
         
             <div class="button_center">
