@@ -6,8 +6,6 @@ from settings import (
     GEOSERVER_REST_URL,
     GS_USERNAME,
     GS_PASSWORD,
-    GS_EXPOSURE_WS,
-    GS_HAZARD_WS,
     GS_IMPACT_WS,
     DATA_PATH,
     ROOT

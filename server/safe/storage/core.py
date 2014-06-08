@@ -11,10 +11,6 @@ from raster import Raster
 from safe.common.utilities import verify, VerificationError
 from safe.common.exceptions import BoundingBoxError, ReadLayerError
 
-# FIXME (Ole): make logging work again
-import logging
-logger = logging.getLogger('inasafe')
-
 
 def read_layer(filename):
     """Read spatial layer from file.

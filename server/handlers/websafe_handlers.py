@@ -1,6 +1,5 @@
 import tornado.web
 import os, sys, json
-import requests
 
 
 from safe.api import read_layer, calculate_impact
@@ -12,6 +11,11 @@ from safe.impact_functions.inundation.flood_OSM_building_impact \
 # Flood Population Evacuation Function
 from safe.impact_functions.inundation.flood_population_evacuation_polygon_hazard \
     import FloodEvacuationFunctionVectorHazard
+
+
+# Test Impact function
+from safe.impact_functions.noah.flood_OSM_building_impact \
+    import NOAHFloodBuildingImpactFunction
 
 from settings import DATA_PATH, GS_IMPACT_WS
 
@@ -32,7 +36,8 @@ class CalculateHandler(tornado.web.RequestHandler):
 
         if impact_function_keyword == 'structure':
             exposure_name = "%s.shp" % self.get_argument("exposure_name")
-            impact_function = FloodBuildingImpactFunction
+            #impact_function = FloodBuildingImpactFunction
+            impact_function = NOAHFloodBuildingImpactFunction
         elif impact_function_keyword == 'population':
             exposure_name = "%s.tif" % self.get_argument("exposure_name")
             impact_function = FloodEvacuationFunctionVectorHazard
@@ -65,30 +70,28 @@ class CalculateHandler(tornado.web.RequestHandler):
             if os.path.exists(output) and os.path.exists(output_summary):
                 print 'impact file and impact summary already exists!'
                 html = open(output_summary)
-                f = html.read()
                 print_pdf(html, impact_base_name)
                 data = {
                     'return': 'success',
                     'resource': impact_base_name,
-                    'html' : f
+                    'html' : html.read()
                 }
             else:
                 try:
-                    make_data_dirs()
-
                     impact = calculate_impact(
                         layers=[exposure_layer, hazard_layer],
                         impact_fcn=impact_function
                     )
                     impact.write_to_file(output)
+                    data = upload_impact_vector(output)
 
                     #create the impact summary file
+                    make_data_dirs()
+
                     result = impact.keywords["impact_summary"]
                     with open(output_summary, 'w+') as summary:
                         summary.write(result)
                         summary.close()
-
-                    data = upload_impact_vector(output)
 
                     if impact_function_keyword == 'population':
                         make_style(impact_base_name, impact.style_info)

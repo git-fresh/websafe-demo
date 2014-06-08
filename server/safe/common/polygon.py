@@ -30,8 +30,6 @@ from safe.common.numerics import grid_to_points, geotransform_to_axes
 from safe.common.exceptions import (
     PolygonInputError, InaSAFEError, PointsInputError)
 
-LOGGER = logging.getLogger('InaSAFE')
-
 
 def separate_points_by_polygon(
         points, polygon,

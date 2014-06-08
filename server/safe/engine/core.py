@@ -15,10 +15,6 @@ from socket import gethostname
 from safe.common.utilities import ugettext as tr
 import getpass
 
-# The LOGGER is intialised in utilities.py by init
-import logging
-LOGGER = logging.getLogger('InaSAFE')
-
 
 def calculate_impact(layers, impact_fcn, extent=None, check_integrity=True):
     """Calculate impact levels as a function of list of input layers
@@ -45,10 +41,6 @@ def calculate_impact(layers, impact_fcn, extent=None, check_integrity=True):
         1. All layers are in WGS84 geographic coordinates
         2. Layers are equipped with metadata such as names and categories
     """
-
-    LOGGER.debug(
-        'calculate_impact called with:\nLayers: %s\nFunction:%s' % (
-            layers, impact_fcn))
 
     # Input checks
     if check_integrity:
@@ -256,58 +248,3 @@ def check_data_integrity(layer_objects):
                                             layer.columns,
                                             refname, N))
             verify(layer.columns == N, msg)
-
-# FIXME (Ole): This needs to be rewritten as it
-# directly depends on ows metadata. See issue #54
-# def get_linked_layers(main_layers):
-#     """Get list of layers that are required by main layers
-
-#     Input
-#        main_layers: List of layers of the form (server, layer_name,
-#                                                 bbox, metadata)
-#     Output
-#        new_layers: New layers flagged by the linked keywords in main layers
-
-
-#     Algorithm will recursively pull layers from new layers if their
-#     keyword linked exists and points to available layers.
-#     """
-
-#     # FIXME: I don't think the naming is very robust.
-#     # Main layer names and workspaces come from the app, while
-#     # we just use the basename from the keywords for the linked layers.
-#     # Not sure if the basename will always work as layer name.
-
-#     new_layers = []
-#     for server, name, bbox, metadata in main_layers:
-
-#         workspace, layername = name.split(':')
-
-#         keywords = metadata['keywords']
-#         if 'linked' in keywords:
-#             basename, _ = os.path.splitext(keywords['linked'])
-
-#             # FIXME (Ole): Geoserver converts names to lowercase @#!!
-#             basename = basename.lower()
-
-#             new_layer = '%s:%s' % (workspace, basename)
-#             if new_layer == name:
-#                 msg = 'Layer %s linked to itself' % name
-#                 raise Exception(msg)
-
-#             try:
-#                 new_metadata = get_metadata(server, new_layer)
-#             except Exception, e:
-#                 msg = ('Linked layer %s could not be found: %s'
-#                        % (basename, str(e)))
-#                 LOGGER.info(msg)
-#                 #raise Exception(msg)
-#             else:
-#                 new_layers.append((server, new_layer, bbox, new_metadata))
-
-#     # Recursively search for linked layers required by the newly added layers
-#     if len(new_layers) > 0:
-#         new_layers += get_linked_layers(new_layers)
-
-#     # Return list of new layers
-#     return new_layers

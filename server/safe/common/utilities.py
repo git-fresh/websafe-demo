@@ -29,9 +29,6 @@ except ImportError:
         raise RuntimeError(("Could not find an"
                             "available OrderedDict implementation"))
 
-import logging
-LOGGER = logging.getLogger('InaSAFE')
-
 
 class MEMORYSTATUSEX(ctypes.Structure):
     """

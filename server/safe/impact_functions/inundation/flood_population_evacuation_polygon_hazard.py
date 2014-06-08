@@ -40,10 +40,6 @@ from safe.common.tables import Table, TableRow, TableCell
 from safe.engine.interpolation import assign_hazard_values_to_exposure_data
 
 
-import logging
-LOGGER = logging.getLogger('InaSAFE')
-
-
 class FloodEvacuationFunctionVectorHazard(FunctionProvider):
     """Impact function for vector flood evacuation
 
@@ -193,14 +189,6 @@ class FloodEvacuationFunctionVectorHazard(FunctionProvider):
             else:
                 #assume that every polygon is affected (see #816)
                 affected = True
-                # there is no flood related attribute
-                #msg = ('No flood related attribute found in %s. '
-                #       'I was looking for either "Flooded", "FLOODPRONE" '
-                #       'or "Affected". The latter should have been '
-                #       'automatically set by call to '
-                #       'assign_hazard_values_to_exposure_data(). '
-                #       'Sorry I can\'t help more.')
-                #raise Exception(msg)
 
             if affected:
                 # Get population at this location
@@ -299,6 +287,8 @@ class FloodEvacuationFunctionVectorHazard(FunctionProvider):
 
         population_counts = [x['population'] for x in new_attributes]
         classes = create_classes(population_counts, len(colours))
+        print classes
+
         interval_classes = humanize_class(classes)
 
         # Define style info for output polygons showing population counts
