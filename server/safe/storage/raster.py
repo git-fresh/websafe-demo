@@ -443,7 +443,6 @@ class Raster(Layer):
                     raise InaSAFEError(msg)
 
             # Replace NODATA_VALUE with NaN array
-            #print 'Replacing', nodata, 'with', NAN
             NaN = numpy.ones(A.shape, A.dtype) * NAN
             A = numpy.where(A == nodata, NaN, A)
 
@@ -464,11 +463,7 @@ class Raster(Layer):
 
             actual_res = self.get_resolution(isotropic=True)
             native_res = self.get_resolution(isotropic=True, native=True)
-            #print
-            #print 'Actual res', actual_res
-            #print 'Native res', native_res
             sigma = (actual_res / native_res) ** 2
-            #print 'Scaling', sigma
         else:
             # See if scaling can work as a scalar value
             try:

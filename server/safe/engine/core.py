@@ -10,10 +10,7 @@ from safe.storage.projection import DEFAULT_PROJECTION
 from safe.impact_functions.core import extract_layers
 from safe.common.utilities import unique_filename, verify
 from utilities import REQUIRED_KEYWORDS
-from datetime import datetime
-from socket import gethostname
 from safe.common.utilities import ugettext as tr
-import getpass
 
 
 def calculate_impact(layers, impact_fcn, extent=None, check_integrity=True):
@@ -52,30 +49,8 @@ def calculate_impact(layers, impact_fcn, extent=None, check_integrity=True):
     if not extent is None:
         impact_function.set_extent(extent)
 
-    # Start time
-    start_time = datetime.now()
-
     # Pass input layers to plugin
     F = impact_function.run(layers)
-
-    # End time
-    end_time = datetime.now()
-
-    # Elapsed time
-    elapsed_time = end_time - start_time
-    # Don's use this - see https://github.com/AIFDR/inasafe/issues/394
-    # elapsed_time_sec = elapsed_time.total_seconds()
-    elapsed_time_sec = elapsed_time.seconds + (elapsed_time.days * 24 * 3600)
-
-    # Eet current time stamp
-    # Need to change : to _ because : is forbidden in keywords
-    time_stamp = end_time.isoformat('_')
-
-    # Get user
-    user = getpass.getuser().replace(' ', '_')
-
-    # Get host
-    host_name = gethostname()
 
     # Get input layer sources
     # NOTE: We assume here that there is only one of each
@@ -96,11 +71,6 @@ def calculate_impact(layers, impact_fcn, extent=None, check_integrity=True):
 
         F.keywords['%s_title' % cat] = title
         F.keywords['%s_source' % cat] = source
-
-    F.keywords['elapsed_time'] = elapsed_time_sec
-    F.keywords['time_stamp'] = time_stamp[:19]  # remove decimal part
-    F.keywords['host_name'] = host_name
-    F.keywords['user'] = user
 
     msg = 'Impact function %s returned None' % str(impact_function)
     verify(F is not None, msg)
@@ -197,9 +167,6 @@ def check_data_integrity(layer_objects):
                    '' % (layer, layer.projection, reference_projection))
             verify(reference_projection == layer.projection, msg)
 
-        # FIXME (Ariel): Make this configurable by the frontend choice?
-        # Relax tolerance requirements to have GeoNode compatibility
-        # tolerance = 10e-12
         tolerance = 10e-7
 
         # Ensure that geotransform and dimensions is consistent across
@@ -214,10 +181,6 @@ def check_data_integrity(layer_objects):
                                       layer.get_geotransform(),
                                       rtol=tolerance), msg)
 
-        # In case of vector layers, we just check that they are non-empty
-        # FIXME (Ole): Not good as nasty error is raised in cases where
-        # there are no buildings in the hazard area. Need to be more graceful
-        # See e.g. shakemap dated 20120227190230
         if layer.is_vector:
             msg = ('There are no vector data features. '
                    'Perhaps zoom out or pan to the study area '

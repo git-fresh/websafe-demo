@@ -96,7 +96,6 @@ def temp_dir(sub_dir='work'):
 
        tmpdir = temp_dir('testing')
        tmpfile = unique_filename(dir=tmpdir)
-       print tmpfile
        /tmp/inasafe/23-08-2012/timlinux/testing/tmpMRpF_C
 
     If you specify INASAFE_WORK_DIR as an environment var, it will be
@@ -152,13 +151,11 @@ def unique_filename(**kwargs):
 
     tempdir = temp_dir(sub_dir='test')
     filename = unique_filename(suffix='.keywords', dir=tempdir)
-    print filename
     /tmp/inasafe/23-08-2012/timlinux/test/tmpyeO5VR.keywords
 
     Or with no preferred subdir, a default subdir of 'impacts' is used:
 
     filename = unique_filename(suffix='.shp')
-    print filename
     /tmp/inasafe/23-08-2012/timlinux/impacts/tmpoOAmOi.shp
 
     """
@@ -549,7 +546,7 @@ def create_classes(my_list, num_classes):
     """
     min_value = numpy.nanmin(my_list)
     max_value = numpy.nanmax(my_list)
-    #print 'min_value, max_value: ', min_value, max_value
+    print 'min_value, max_value: ', min_value, max_value
     if min_value == 0:
         num_classes += 1
         # noinspection PyTypeChecker,PyUnresolvedReferences

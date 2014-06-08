@@ -786,13 +786,6 @@ class Vector(Layer):
                     elif val is None:
                         val = ''
 
-                    # We do this because there is NaN problem on windows
-                    # NaN value must be converted to _pseudo_in to solve the
-                    # problem. But, when InaSAFE read the file, it'll be
-                    # converted back to NaN value, so that NaN in InaSAFE is a
-                    # numpy.nan
-                    # please check https://github.com/AIFDR/inasafe/issues/269
-                    # for more information
                     if val != val:
                         val = _pseudo_inf
 
@@ -1130,7 +1123,6 @@ def convert_polygons_to_centroids(V):
 
     geometry = V.get_geometry()
     N = len(V)
-    print N
 
     # Calculate points for each polygon
     centroids = []

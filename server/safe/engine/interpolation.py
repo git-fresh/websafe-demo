@@ -354,7 +354,6 @@ def interpolate_polygon_raster(source, target,
     res = clip_grid_by_polygons(target.get_data(scaling=False),
                                 target.get_geotransform(),
                                 polygon_geometry)
-    print res
 
     # Create one new point layer with interpolated attributes
     new_geometry = []
@@ -503,7 +502,6 @@ def interpolate_polygon_points(source, target,
     for i, polygon in enumerate(geom):
         # Carry all attributes across from source
         poly_attr = data[i]
-        print poly_attr
 
         # Assign default attribute to indicate points inside
         poly_attr[DEFAULT_ATTRIBUTE] = True
@@ -511,8 +509,6 @@ def interpolate_polygon_points(source, target,
         # Clip data points by polygons and add polygon attributes
         indices = inside_polygon(points, polygon.outer_ring,
                                  holes=polygon.inner_rings)
-
-        print indices
 
         for k in indices:
             for key in poly_attr:
