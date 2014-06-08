@@ -354,6 +354,7 @@ def interpolate_polygon_raster(source, target,
     res = clip_grid_by_polygons(target.get_data(scaling=False),
                                 target.get_geotransform(),
                                 polygon_geometry)
+    print res
 
     # Create one new point layer with interpolated attributes
     new_geometry = []

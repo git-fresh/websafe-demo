@@ -287,7 +287,6 @@ class FloodEvacuationFunctionVectorHazard(FunctionProvider):
 
         population_counts = [x['population'] for x in new_attributes]
         classes = create_classes(population_counts, len(colours))
-        print classes
 
         interval_classes = humanize_class(classes)
 

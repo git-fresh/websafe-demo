@@ -69,13 +69,13 @@ class CalculateHandler(tornado.web.RequestHandler):
 
             if os.path.exists(output) and os.path.exists(output_summary):
                 print 'impact file and impact summary already exists!'
-                html = open(output_summary)
-                print_pdf(html, impact_base_name)
                 data = {
                     'return': 'success',
                     'resource': impact_base_name,
-                    'html' : html.read()
                 }
+                with open(output_summary) as html:
+                    data['html'] = html.read()
+                    html.close()
             else:
                 try:
                     impact = calculate_impact(

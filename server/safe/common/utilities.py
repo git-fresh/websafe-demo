@@ -549,7 +549,7 @@ def create_classes(my_list, num_classes):
     """
     min_value = numpy.nanmin(my_list)
     max_value = numpy.nanmax(my_list)
-    print 'min_value, max_value: ', min_value, max_value
+    #print 'min_value, max_value: ', min_value, max_value
     if min_value == 0:
         num_classes += 1
         # noinspection PyTypeChecker,PyUnresolvedReferences

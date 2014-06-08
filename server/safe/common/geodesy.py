@@ -234,9 +234,6 @@ class Point(object):
             else:
                 stepmin = step
 
-        #print
-        #print ('Found geographical distance %f degrees yielding radius %f m'
-        #       % (step, d))
         r = step
 
         # Generate circle with geographic radius = step (degrees)
