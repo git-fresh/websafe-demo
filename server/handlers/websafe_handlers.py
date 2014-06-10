@@ -14,7 +14,7 @@ from safe.impact_functions.inundation.flood_population_evacuation_polygon_hazard
 
 
 # Test Impact function
-from safe.impact_functions.noah.flood_OSM_building_impact \
+from safe.impact_functions.test.flood_OSM_building_impact \
     import NOAHFloodBuildingImpactFunction
 
 from settings import DATA_PATH, GS_IMPACT_WS
