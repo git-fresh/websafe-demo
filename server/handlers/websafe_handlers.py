@@ -75,6 +75,7 @@ class CalculateHandler(tornado.web.RequestHandler):
                 }
                 with open(output_summary) as html:
                     data['html'] = html.read()
+                    print_pdf(data['html'], impact_base_name)
                     html.close()
             else:
                 try:
@@ -114,7 +115,8 @@ class ImpactPdfHandler(tornado.web.RequestHandler):
     def get(self):
         impact_name = "%s.pdf" % self.get_argument("q")
         try:
-            data = open(os.path.join(DATA_PATH, 'impact report', impact_name))
+            report_path = os.path.join(DATA_PATH, 'impact report', impact_name)
+            data = open(report_path)
             f = data.read()
             self.set_header("Content-Type", "application/pdf")
             self.write(f)
