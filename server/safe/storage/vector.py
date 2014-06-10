@@ -453,7 +453,6 @@ class Vector(Layer):
                    'used. Specify sublayer when creating '
                    'the Vector if you wish to use a different layer.'
                    % (filename, fid.GetLayerCount()))
-            LOGGER.warn(msg)
             # Why do we raise an exception if it is only a warning? TS
             raise ReadLayerError(msg)
 
@@ -787,13 +786,6 @@ class Vector(Layer):
                     elif val is None:
                         val = ''
 
-                    # We do this because there is NaN problem on windows
-                    # NaN value must be converted to _pseudo_in to solve the
-                    # problem. But, when InaSAFE read the file, it'll be
-                    # converted back to NaN value, so that NaN in InaSAFE is a
-                    # numpy.nan
-                    # please check https://github.com/AIFDR/inasafe/issues/269
-                    # for more information
                     if val != val:
                         val = _pseudo_inf
 

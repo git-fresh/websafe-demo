@@ -6,8 +6,6 @@ To register the plugin, the module must be imported by the Python process
 using it.
 """
 
-
-import logging
 from math import ceil
 
 import numpy
@@ -18,9 +16,6 @@ from safe.common.polygon import inside_polygon
 from safe.common.utilities import ugettext as tr
 from safe.common.tables import Table, TableCell, TableRow
 from utilities import pretty_string, remove_double_spaces
-
-
-LOGGER = logging.getLogger('InaSAFE')
 
 
 # Disable lots of pylint for this as it is using magic
@@ -307,8 +302,6 @@ def requirement_check(params, require_str, verbose=False):
         if key in python_keywords.kwlist:
             msg = ('Error in plugin requirements'
                    'Must not use Python keywords as params: %s' % key)
-            #print msg
-            #logger.error(msg)
             return False
 
         if key in excluded_keywords:
@@ -339,8 +332,6 @@ def requirement_check(params, require_str, verbose=False):
     except Exception, e:
         msg = ('Requirements header could not compiled: %s. '
                'Original message: %s' % (execstr, e))
-        #print msg
-        #logger.error(msg)
 
     return False
 
@@ -603,9 +594,6 @@ def get_admissible_plugins(keywords=None):  # , name=None):
         Dictionary of impact functions ({name: class})
     """
 
-    # This is very verbose, but sometimes useful
-    # LOGGER.debug(keywords_to_str(keywords))
-
     # Input checks
     if keywords is None:
         keywords = []
@@ -630,9 +618,6 @@ def get_admissible_plugins(keywords=None):  # , name=None):
                 match = False
         if match:
             admissible_plugins[f_name] = func
-
-    # This is very verbose, but sometimes useful
-    # LOGGER.debug(admissible_plugins_to_str(admissible_plugins))
 
     # Return (possibly empty) dictionary
     return admissible_plugins

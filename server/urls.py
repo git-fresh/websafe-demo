@@ -1,4 +1,5 @@
-from handlers.handlers import IndexHandler, WebsafeHandler, LayersHandler
+from handlers.handlers import IndexHandler, WebsafeHandler, \
+    ExposureHandler, HazardHandler, GetCapabilitiesHandler
 from handlers.websafe_handlers import CalculateHandler, ImpactPdfHandler
 
 import os.path
@@ -12,9 +13,11 @@ handlers = [
 # api handlers
 handlers += [
     (r"/api/websafe", WebsafeHandler),
-    (r"/api/layers", LayersHandler),
     (r"/api/calculate", CalculateHandler),
-    (r"/api/pdf", ImpactPdfHandler)
+    (r"/api/pdf", ImpactPdfHandler),
+    (r"/exposures", ExposureHandler),
+    (r"/hazards", HazardHandler),
+    (r"/getcapabilities", GetCapabilitiesHandler)
 ]
 
 class Application(tornado.web.Application):

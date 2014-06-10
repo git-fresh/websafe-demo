@@ -29,9 +29,6 @@ except ImportError:
         raise RuntimeError(("Could not find an"
                             "available OrderedDict implementation"))
 
-import logging
-LOGGER = logging.getLogger('InaSAFE')
-
 
 class MEMORYSTATUSEX(ctypes.Structure):
     """
@@ -99,7 +96,6 @@ def temp_dir(sub_dir='work'):
 
        tmpdir = temp_dir('testing')
        tmpfile = unique_filename(dir=tmpdir)
-       print tmpfile
        /tmp/inasafe/23-08-2012/timlinux/testing/tmpMRpF_C
 
     If you specify INASAFE_WORK_DIR as an environment var, it will be
@@ -155,13 +151,11 @@ def unique_filename(**kwargs):
 
     tempdir = temp_dir(sub_dir='test')
     filename = unique_filename(suffix='.keywords', dir=tempdir)
-    print filename
     /tmp/inasafe/23-08-2012/timlinux/test/tmpyeO5VR.keywords
 
     Or with no preferred subdir, a default subdir of 'impacts' is used:
 
     filename = unique_filename(suffix='.shp')
-    print filename
     /tmp/inasafe/23-08-2012/timlinux/impacts/tmpoOAmOi.shp
 
     """

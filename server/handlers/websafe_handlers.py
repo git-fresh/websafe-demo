@@ -1,25 +1,25 @@
 import tornado.web
 import os, sys, json
-import requests
 
 
 from safe.api import read_layer, calculate_impact
+
+# Flood Building Impact Function
 from safe.impact_functions.inundation.flood_OSM_building_impact \
     import FloodBuildingImpactFunction
+
+# Flood Population Evacuation Function
 from safe.impact_functions.inundation.flood_population_evacuation_polygon_hazard \
     import FloodEvacuationFunctionVectorHazard
 
-from settings import (
-    GEOSERVER_REST_URL,
-    GS_USERNAME,
-    GS_PASSWORD,
-    GEOSERVER_WORKSPACE,
-    GEOSERVER_STORE,
-    DATA_PATH,
-    GEOSERVER_COOKIE_URL
-)
 
-from utilities import make_data_dirs, upload_to_geoserver, print_pdf, \
+# Test Impact function
+from safe.impact_functions.test.flood_OSM_building_impact \
+    import NOAHFloodBuildingImpactFunction
+
+from settings import DATA_PATH, GS_IMPACT_WS
+
+from utilities import make_data_dirs, upload_impact_vector, print_pdf, \
     set_style, make_style
 from geoserver.catalog import Catalog
 
@@ -28,20 +28,21 @@ class CalculateHandler(tornado.web.RequestHandler):
     def get(self):
         data = dict()
         encoding = sys.getfilesystemencoding()
-        exposure_title = ''
+        exposure_name = ''
 
-        hazard_title = "%s.shp" % self.get_argument("hazard_title")
-        hazard_path = os.path.join(DATA_PATH, 'hazard', hazard_title)
+        hazard_name = "%s.shp" % self.get_argument("hazard_name")
+        hazard_path = os.path.join(DATA_PATH, 'hazard', hazard_name)
         impact_function_keyword = self.get_argument("impact_function")
 
         if impact_function_keyword == 'structure':
-            exposure_title = "%s.shp" % self.get_argument("exposure_title")
-            impact_function = FloodBuildingImpactFunction
+            exposure_name = "%s.shp" % self.get_argument("exposure_name")
+            #impact_function = FloodBuildingImpactFunction
+            impact_function = NOAHFloodBuildingImpactFunction
         elif impact_function_keyword == 'population':
-            exposure_title = "%s.tif" % self.get_argument("exposure_title")
+            exposure_name = "%s.tif" % self.get_argument("exposure_name")
             impact_function = FloodEvacuationFunctionVectorHazard
 
-        exposure_path = os.path.join(DATA_PATH, 'exposure', exposure_title)
+        exposure_path = os.path.join(DATA_PATH, 'exposure', exposure_name)
 
         try:
             hazard_layer = read_layer(hazard_path.encode(encoding))
@@ -57,8 +58,8 @@ class CalculateHandler(tornado.web.RequestHandler):
             elif impact_function_keyword == 'population':
                 exposure_layer.keywords['subcategory'] = 'population'
 
-            haz_fnam, ext = os.path.splitext(hazard_title)
-            exp_fnam, ext = os.path.splitext(exposure_title)
+            haz_fnam, ext = os.path.splitext(hazard_name)
+            exp_fnam, ext = os.path.splitext(exposure_name)
             impact_base_name = "IMPACT_%s_%s" % (exp_fnam, haz_fnam)
             impact_filename = impact_base_name + '.shp'
             impact_summary = "IMPACT_%s_%s.html" % (exp_fnam, haz_fnam)
@@ -68,32 +69,30 @@ class CalculateHandler(tornado.web.RequestHandler):
 
             if os.path.exists(output) and os.path.exists(output_summary):
                 print 'impact file and impact summary already exists!'
-                html = open(output_summary)
-                f = html.read()
-                layer = { 
-                        'workspace': GEOSERVER_WORKSPACE,
-                        'store'    : GEOSERVER_STORE,
-                        'resource' : impact_base_name
-                        }
-                print_pdf(html, impact_base_name)
-                data = {'return':'ok', 'layer': layer, 'html' : f}
+                data = {
+                    'return': 'success',
+                    'resource': impact_base_name,
+                }
+                with open(output_summary) as html:
+                    data['html'] = html.read()
+                    print_pdf(data['html'], impact_base_name)
+                    html.close()
             else:
                 try:
-                    make_data_dirs()
-
                     impact = calculate_impact(
                         layers=[exposure_layer, hazard_layer],
                         impact_fcn=impact_function
                     )
                     impact.write_to_file(output)
+                    data = upload_impact_vector(output)
 
                     #create the impact summary file
+                    make_data_dirs()
+
                     result = impact.keywords["impact_summary"]
-                    with open(output_summary, 'w') as summary:
+                    with open(output_summary, 'w+') as summary:
                         summary.write(result)
                         summary.close()
-
-                    data = upload_to_geoserver(output)
 
                     if impact_function_keyword == 'population':
                         make_style(impact_base_name, impact.style_info)
@@ -116,7 +115,8 @@ class ImpactPdfHandler(tornado.web.RequestHandler):
     def get(self):
         impact_name = "%s.pdf" % self.get_argument("q")
         try:
-            data = open(os.path.join(DATA_PATH, 'impact report', impact_name))
+            report_path = os.path.join(DATA_PATH, 'impact report', impact_name)
+            data = open(report_path)
             f = data.read()
             self.set_header("Content-Type", "application/pdf")
             self.write(f)

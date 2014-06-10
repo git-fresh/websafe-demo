@@ -1,15 +1,12 @@
 import sys, requests, os, math
 
-from paver.easy import path, sh, info, call_task
-
 from geoserver.catalog import Catalog
 
 from settings import (
     GEOSERVER_REST_URL,
     GS_USERNAME,
     GS_PASSWORD,
-    GEOSERVER_WORKSPACE,
-    GEOSERVER_STORE,
+    GS_IMPACT_WS,
     DATA_PATH,
     ROOT
 )
@@ -18,25 +15,21 @@ from sld import *
 
 from weasyprint import HTML, CSS
 
-
 def make_data_dirs():
-	try:
-		impact_dir = path('data/impact')
-		if not impact_dir.exists():
-			impact_dir.makedirs()
+    try:
+        impact_report_dir = os.path.join(DATA_PATH, 'impact report')
+        if not os.path.exists(impact_report_dir):
+            os.makedirs(impact_report_dir)
 
-		impact_summary_dir = path('data/impact summary')
-		if not impact_summary_dir.exists():
-			impact_summary_dir.makedirs()
-	except:
-		raise
+        impact_summary_dir = os.path.join(DATA_PATH, 'impact summary')
+        if not os.path.exists(impact_summary_dir):
+            os.makedirs(impact_summary_dir)
+    except:
+        raise
 
+# TODO: to be removed if jsPDF report generation is a success
 def print_pdf(html, impact_name):
     try:
-        impact_report_dir = path('data/impact report')
-        if not impact_report_dir.exists():
-            impact_report_dir.makedirs()
-
         impact_report_filename = "%s.pdf" % impact_name
 
         output = os.path.join(DATA_PATH, 'impact report', impact_report_filename)
@@ -47,37 +40,45 @@ def print_pdf(html, impact_name):
     except:
         raise
 
-def upload_to_geoserver(impact_file_path):
+def upload_impact_vector(impact_file_path):
     data = dict()
     try:
         cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
-        ws = cat.get_workspace(GEOSERVER_WORKSPACE)
-        ds = cat.get_store(GEOSERVER_STORE)
+        ws = cat.get_workspace(GS_IMPACT_WS)
 
         base = str(os.path.splitext(impact_file_path)[0])
         name = str(os.path.splitext(os.path.basename(base))[0])
 
-        shp = impact_file_path
         shx = base + '.shx'
         dbf = base + '.dbf'
         prj = base + '.prj'
         data = { 
-                 'shp' : shp,
+                 'shp' : impact_file_path,
                  'shx' : shx,
                  'dbf' : dbf,
                  'prj' : prj
                }
-        cat.add_data_to_store(ds, name, data, ws, True)
-        layer = { 
-                    'workspace': GEOSERVER_WORKSPACE,
-                    'store'    : GEOSERVER_STORE,
-                    'resource' : name
-                }
-        data = {'return':'ok', 'layer': layer }
+
+        cat.create_featurestore(name, data, ws, True)
+
+        data = {'return': 'success', 'resource' : name }
     except:
-        raise
+        return {'return': 'fail'}
     else:
         return data
+
+def upload_raster(impact_file_path):
+    data = dict()
+    try:
+        cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
+        ws = cat.get_workspace(GS_IMPACT_WS)
+
+        base = str(os.path.splitext(impact_file_path)[0])
+        name = str(os.path.splitext(os.path.basename(base))[0])
+
+        cat.create_coveragestore(name, impact_file_path, ws, True)
+    except:
+        raise
 
 """ Set the style of the layer with name: layer_name
 """
@@ -85,12 +86,8 @@ def set_style(layer_name, style):
     try:
         cat = Catalog(GEOSERVER_REST_URL, GS_USERNAME, GS_PASSWORD)
         layer = cat.get_layer(layer_name)
-
-        if style is None:
-            print 'No style specified!'
-            return
     
-        style = cat.get_style(style, GEOSERVER_WORKSPACE)
+        style = cat.get_style(style)
         layer.default_style = style
         cat.save(layer)
     except:
@@ -144,6 +141,6 @@ def make_style(style_name, style_info):
         style.close()
 
     with open(style_file_path, 'r') as style:
-        cat.create_style(style_name, style.read(), workspace=GEOSERVER_WORKSPACE, overwrite=True)
+        cat.create_style(style_name, style.read(), overwrite=True)
         style.close()
     

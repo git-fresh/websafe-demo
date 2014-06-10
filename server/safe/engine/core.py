@@ -10,14 +10,7 @@ from safe.storage.projection import DEFAULT_PROJECTION
 from safe.impact_functions.core import extract_layers
 from safe.common.utilities import unique_filename, verify
 from utilities import REQUIRED_KEYWORDS
-from datetime import datetime
-from socket import gethostname
 from safe.common.utilities import ugettext as tr
-import getpass
-
-# The LOGGER is intialised in utilities.py by init
-import logging
-LOGGER = logging.getLogger('InaSAFE')
 
 
 def calculate_impact(layers, impact_fcn, extent=None, check_integrity=True):
@@ -46,10 +39,6 @@ def calculate_impact(layers, impact_fcn, extent=None, check_integrity=True):
         2. Layers are equipped with metadata such as names and categories
     """
 
-    LOGGER.debug(
-        'calculate_impact called with:\nLayers: %s\nFunction:%s' % (
-            layers, impact_fcn))
-
     # Input checks
     if check_integrity:
         check_data_integrity(layers)
@@ -60,30 +49,8 @@ def calculate_impact(layers, impact_fcn, extent=None, check_integrity=True):
     if not extent is None:
         impact_function.set_extent(extent)
 
-    # Start time
-    start_time = datetime.now()
-
     # Pass input layers to plugin
     F = impact_function.run(layers)
-
-    # End time
-    end_time = datetime.now()
-
-    # Elapsed time
-    elapsed_time = end_time - start_time
-    # Don's use this - see https://github.com/AIFDR/inasafe/issues/394
-    # elapsed_time_sec = elapsed_time.total_seconds()
-    elapsed_time_sec = elapsed_time.seconds + (elapsed_time.days * 24 * 3600)
-
-    # Eet current time stamp
-    # Need to change : to _ because : is forbidden in keywords
-    time_stamp = end_time.isoformat('_')
-
-    # Get user
-    user = getpass.getuser().replace(' ', '_')
-
-    # Get host
-    host_name = gethostname()
 
     # Get input layer sources
     # NOTE: We assume here that there is only one of each
@@ -104,11 +71,6 @@ def calculate_impact(layers, impact_fcn, extent=None, check_integrity=True):
 
         F.keywords['%s_title' % cat] = title
         F.keywords['%s_source' % cat] = source
-
-    F.keywords['elapsed_time'] = elapsed_time_sec
-    F.keywords['time_stamp'] = time_stamp[:19]  # remove decimal part
-    F.keywords['host_name'] = host_name
-    F.keywords['user'] = user
 
     msg = 'Impact function %s returned None' % str(impact_function)
     verify(F is not None, msg)
@@ -205,9 +167,6 @@ def check_data_integrity(layer_objects):
                    '' % (layer, layer.projection, reference_projection))
             verify(reference_projection == layer.projection, msg)
 
-        # FIXME (Ariel): Make this configurable by the frontend choice?
-        # Relax tolerance requirements to have GeoNode compatibility
-        # tolerance = 10e-12
         tolerance = 10e-7
 
         # Ensure that geotransform and dimensions is consistent across
@@ -222,10 +181,6 @@ def check_data_integrity(layer_objects):
                                       layer.get_geotransform(),
                                       rtol=tolerance), msg)
 
-        # In case of vector layers, we just check that they are non-empty
-        # FIXME (Ole): Not good as nasty error is raised in cases where
-        # there are no buildings in the hazard area. Need to be more graceful
-        # See e.g. shakemap dated 20120227190230
         if layer.is_vector:
             msg = ('There are no vector data features. '
                    'Perhaps zoom out or pan to the study area '
@@ -256,58 +211,3 @@ def check_data_integrity(layer_objects):
                                             layer.columns,
                                             refname, N))
             verify(layer.columns == N, msg)
-
-# FIXME (Ole): This needs to be rewritten as it
-# directly depends on ows metadata. See issue #54
-# def get_linked_layers(main_layers):
-#     """Get list of layers that are required by main layers
-
-#     Input
-#        main_layers: List of layers of the form (server, layer_name,
-#                                                 bbox, metadata)
-#     Output
-#        new_layers: New layers flagged by the linked keywords in main layers
-
-
-#     Algorithm will recursively pull layers from new layers if their
-#     keyword linked exists and points to available layers.
-#     """
-
-#     # FIXME: I don't think the naming is very robust.
-#     # Main layer names and workspaces come from the app, while
-#     # we just use the basename from the keywords for the linked layers.
-#     # Not sure if the basename will always work as layer name.
-
-#     new_layers = []
-#     for server, name, bbox, metadata in main_layers:
-
-#         workspace, layername = name.split(':')
-
-#         keywords = metadata['keywords']
-#         if 'linked' in keywords:
-#             basename, _ = os.path.splitext(keywords['linked'])
-
-#             # FIXME (Ole): Geoserver converts names to lowercase @#!!
-#             basename = basename.lower()
-
-#             new_layer = '%s:%s' % (workspace, basename)
-#             if new_layer == name:
-#                 msg = 'Layer %s linked to itself' % name
-#                 raise Exception(msg)
-
-#             try:
-#                 new_metadata = get_metadata(server, new_layer)
-#             except Exception, e:
-#                 msg = ('Linked layer %s could not be found: %s'
-#                        % (basename, str(e)))
-#                 LOGGER.info(msg)
-#                 #raise Exception(msg)
-#             else:
-#                 new_layers.append((server, new_layer, bbox, new_metadata))
-
-#     # Recursively search for linked layers required by the newly added layers
-#     if len(new_layers) > 0:
-#         new_layers += get_linked_layers(new_layers)
-
-#     # Return list of new layers
-#     return new_layers

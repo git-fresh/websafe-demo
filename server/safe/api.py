@@ -74,25 +74,5 @@ from safe.common.utilities import (
     get_utm_epsg,
     feature_attributes_as_dict,
     which)
-from safe.common.shake_grid_converter import convert_mmi_data
-from safe.common.version import get_version
 from safe.common.polygon import in_and_outside_polygon
 from safe.common.tables import Table, TableCell, TableRow
-from safe.postprocessors import (
-    get_postprocessors,
-    get_postprocessor_human_name)
-from safe import messaging
-from safe.messaging import styles
-from safe.common.signals import (
-    DYNAMIC_MESSAGE_SIGNAL,
-    STATIC_MESSAGE_SIGNAL,
-    ERROR_MESSAGE_SIGNAL)
-from safe.messaging import ErrorMessage
-
-# hack for excluding test-related import in builded package
-try:
-    from safe.common.testing import (
-        HAZDATA, EXPDATA, TESTDATA, UNITDATA, BOUNDDATA)
-except ImportError:
-    pass
-# pylint: enable=W0611
