@@ -1,7 +1,7 @@
 
 .info-board {
   margin: 8px 0px 8px 0px !important;
-  height: 150px;
+  height: 130px;
   background-color: #BCC !important;
 }
 
@@ -10,8 +10,6 @@
 }
 
 .info-board a {
-  position: relative;
-  left: 45%;
   cursor: pointer;
   cursor: hand;
 }

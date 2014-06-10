@@ -1,7 +1,10 @@
 <div class="websafe_window">
     <a class="return" href="#/" title="Close Menu"></a>
 
-    <div class="filetree exposure-filetree">
+    <div class="filetree exposure-filetree"
+        tooltip-placement="bottom"
+        tooltip-trigger="onTrigger"
+        tooltip="Select exposure here">
         <select style="width:300px" ui-select2="exposure_selector"
                 data-placeholder="Select exposure layer"
                 ng-model="exposure.name"
@@ -13,7 +16,10 @@
         </select>
     </div>
 
-    <div class="filetree hazard-filetree">
+    <div class="filetree hazard-filetree"
+        tooltip-placement="bottom"
+        tooltip-trigger="onTrigger"
+        tooltip="Select hazard here">
         <select style="width:300px" ui-select2="hazard_selector"
                 data-placeholder="Select hazard layer"
                 ng-model="hazard.name"
@@ -36,12 +42,22 @@
                 </div>
                 <div class="panel-body">
                     <ol>
-                        <li>Choose exposure layer</li>
-                        <li>Choose hazard layer</li>
-                        <li>Press 'Calculate'</li>
+                        <li>Choose
+                            <a ng-mouseenter="onTrigger('.exposure-filetree')"
+                                ng-mouseleave="offTrigger('.exposure-filetree')">exposure</a>
+                        </li>
+                        <li>Choose
+                            <a ng-mouseenter="onTrigger('.hazard-filetree')"
+                                ng-mouseleave="offTrigger('.hazard-filetree')">hazard</a>
+                        </li>
+                        <li>Choose <a ng-mouseenter="onTrigger('.impact-select')"
+                                ng-mouseleave="offTrigger('.impact-select')">impact</a>
+                            function
+                        </li>
+                        <li>Press <a ng-mouseenter="onTrigger('.ladda-button')"
+                                ng-mouseleave="offTrigger('.ladda-button')">'Calculate'</a>
+                        </li>
                     </ol>
-
-                    <a class="glyphicon glyphicon-question-sign"></a>
                 </div>
             </div>
             
@@ -54,15 +70,23 @@
             <label>How Many:</label>
             <input type="text" class="question-form-elements" placeholder="Exposure" ng-model="exposure.name" disabled>
             <label>Will:</label><br/>
-            <select class="question-form-elements" 
+            <select class="question-form-elements impact-select" 
+                tooltip-placement="right"
+                tooltip-trigger="onTrigger"
+                tooltip="Select impact function here"
                 ng-init="impact.impact_function = impact_functions[0].value"
                 ng-model="impact.impact_function" 
                 ng-options="impact.value as impact.label for impact in impact_functions">
             </select>
 
             <div class="button_center">
-                <button class="btn btn-primary btn-sm ladda-button" data-style="expand-left"
-                    ng-click="calculate()" ng-hide="resultReady">
+                <button class="btn btn-primary btn-sm ladda-button"
+                    tooltip-placement="right"
+                    tooltip-trigger="onTrigger"
+                    tooltip="Press calculate button"
+                    data-style="expand-left"
+                    ng-click="calculate()"
+                    ng-hide="resultReady">
                     <span class="ladda-label">Calculate</span>
                 </button>
                 <button class="btn btn-primary btn-sm" ng-click="open()" ng-show="resultReady">Show Report</button>

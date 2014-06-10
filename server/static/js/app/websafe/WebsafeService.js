@@ -4,6 +4,7 @@ var module = angular.module('websafe_service', [
     'websafe_config'
     ]);
 
+// This contains all functionalities related to Geoserver and Openlayers 3
 module.factory('MapFunctions', [
     '$rootScope',
     '$http',
@@ -11,8 +12,6 @@ module.factory('MapFunctions', [
     '$timeout',
     'WebsafeConfig',
     function ($rootScope, $http, $q, $timeout, WebsafeConfig) {
-        var geoserver_url = 'http://localhost:8080/geoserver/wms';
-
         // define some constants
         var map = $rootScope.map;
         var gmap = $rootScope.gmap;
@@ -36,7 +35,7 @@ module.factory('MapFunctions', [
             fetchWMSLayer : function(resource_name){
                 var layer = new ol.layer.Image({
                     source: new ol.source.ImageWMS({
-                        url: geoserver_url,
+                        url: WebsafeConfig.geoserver_url,
                         params: {
                             'SERVICE': 'WMS',
                             'VERSION': version,
@@ -130,7 +129,7 @@ module.factory('MapFunctions', [
             },
 
             getLegend : function(layer_name){
-                var url = geoserver_url + '?REQUEST=GetLegendGraphic&VERSION=' +
+                var url = WebsafeConfig.geoserver_url + '?REQUEST=GetLegendGraphic&VERSION=' +
                         version + '&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=' +
                         layer_name + '&LEGEND_OPTIONS=fontName:Arial;forceLabels:on;';
 
@@ -140,6 +139,7 @@ module.factory('MapFunctions', [
     }
 ]);
 
+// This contains all of the functionalities related to the backend
 module.factory('WebsafeFunctions', [
     '$rootScope',
     '$http',

@@ -8,6 +8,15 @@ var module = angular.module('websafe_module', [
     'ngSanitize'
 ]);
 
+module.config(['$tooltipProvider', function($tooltipProvider){
+    $tooltipProvider.setTriggers({
+        'mouseenter': 'mouseleave',
+        'click': 'click',
+        'focus': 'blur',
+        'onTrigger': 'offTrigger'
+    });
+}]);
+
 module.controller('ModalCtrl', [
     '$scope',
     '$modalInstance',
@@ -28,11 +37,12 @@ module.controller('WebsafeCtrl', [
     '$scope',
     '$window',
     '$modal',
+    '$timeout',
     '$rootScope',
     'MapFunctions',
     'WebsafeFunctions',
     'WebsafeConfig',
-    function($scope, $window, $modal, $rootScope, MapFunctions, WebsafeFunctions, WebsafeConfig){
+    function($scope, $window, $modal, $timeout, $rootScope, MapFunctions, WebsafeFunctions, WebsafeConfig){
         $scope.init = function(){
             $scope.help_toggle = false;
             $scope.hazard = { type: 'haz' };
@@ -51,6 +61,14 @@ module.controller('WebsafeCtrl', [
 
         $scope.exposure_selector = { width: '250px' };
         $scope.hazard_selector = { width: '250px' };
+
+        $scope.onTrigger = function(target){
+            $timeout(function() { $(target).trigger('onTrigger'); }, 0);
+        };
+
+        $scope.offTrigger = function(target){
+            $timeout(function() { $(target).trigger('offTrigger'); }, 0);
+        };
         
         $scope.showHelp = function(){ $scope.help_toggle = true; };
         $scope.hideHelp = function(){ $scope.help_toggle = false; };
@@ -145,6 +163,7 @@ module.controller('WebsafeCtrl', [
                 });
             }
         };
+
 
         // initialize the websafe window height
         var mapHeight = $window.innerHeight - 
